@@ -8,10 +8,26 @@
         <version>1.0.0</version>
     </parent>
 
-    <artifactId>eu.nets.utils.jetty</artifactId>
+    <groupId>eu.nets.utils.jetty</groupId>
+    <artifactId>embedded-jetty</artifactId>
     <packaging>jar</packaging>
+    <version>0.1-SNAPSHOT</version>
     <name>embedded-jetty</name>
     <description>Code for starting embededd Jetty</description>
+
+    <developers>
+        <developer>
+            <id>krosenvold</id>
+            <name>Kristian Rosenvold</name>
+            <email>kristian@zenior.no</email>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git@vm-psource-4:embedded-jetty/embedded-jetty.git</connection>
+        <developerConnection>scm:git:git@vm-psource-4:embedded-jetty/embedded-jetty.git</developerConnection>
+        <url>https://vm-psource-4/embedded-jetty/embedded-jetty</url>
+    </scm>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
