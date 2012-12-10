@@ -1,4 +1,4 @@
-package eu.nets.embeddedjetty;
+package eu.nets.utils.jetty.embedded;
 
 import org.apache.log4j.DailyRollingFileAppender;
 import org.apache.log4j.Level;

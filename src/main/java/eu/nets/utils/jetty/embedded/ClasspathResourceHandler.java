@@ -1,4 +1,4 @@
-package eu.nets.embeddedjetty;
+package eu.nets.utils.jetty.embedded;
 
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.util.resource.Resource;

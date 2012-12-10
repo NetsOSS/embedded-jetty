@@ -1,4 +1,4 @@
-package eu.nets.embeddedjetty;
+package eu.nets.utils.jetty.embedded;
 
 import org.apache.wicket.RuntimeConfigurationType;
 import org.apache.wicket.protocol.http.WebApplication;

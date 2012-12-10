@@ -1,4 +1,4 @@
-package eu.nets.embeddedjetty;
+package eu.nets.utils.jetty.embedded;
 
 import com.google.common.base.Splitter;
 import org.slf4j.Logger;

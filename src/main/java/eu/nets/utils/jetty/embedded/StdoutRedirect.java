@@ -1,4 +1,4 @@
-package eu.nets.embeddedjetty;
+package eu.nets.utils.jetty.embedded;
 
 import org.slf4j.LoggerFactory;
 
