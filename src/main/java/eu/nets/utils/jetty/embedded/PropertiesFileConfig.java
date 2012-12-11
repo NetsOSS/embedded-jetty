@@ -7,12 +7,12 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.nio.charset.Charset;
 
-public class PropertiesFileAppSource  {
+public class PropertiesFileConfig implements ContextPathConfig {
 
-    private static final Logger log = LoggerFactory.getLogger(PropertiesFileAppSource.class);
+    private static final Logger log = LoggerFactory.getLogger(PropertiesFileConfig.class);
 
 
-    public PropertiesFileAppSource() {
+    public PropertiesFileConfig() {
         applyEnvironment();
     }
 

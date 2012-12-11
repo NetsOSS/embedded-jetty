@@ -48,9 +48,9 @@ public class EmbeddedJettyBuilder {
     private long initTime;
     List<HandlerBuilder> handlers = new ArrayList<HandlerBuilder>();
 
-    public EmbeddedJettyBuilder(String contextPath, int port, boolean devMode) {
-        this.contextPath = contextPath;
-        this.port = port;
+    public EmbeddedJettyBuilder(ContextPathConfig context, boolean devMode) {
+        this.contextPath = context.getContextPath();
+        this.port = context.getPort();
         this.devMode = devMode;
         server = createServer(port, devMode);
     }
