@@ -8,7 +8,7 @@ import org.springframework.web.context.support.AnnotationConfigWebApplicationCon
 import org.springframework.ws.transport.http.MessageDispatcherServlet;
 
 import javax.servlet.ServletContext;
-import java.util.EventListener;
+import javax.servlet.ServletContextListener;
 
 /**
  * Spring initialization code
@@ -18,7 +18,7 @@ import java.util.EventListener;
  * @author Kristian Rosenvold
  */
 public class EmbeddedSpringBuilder {
-    public static EventListener createSpringContextLoader(final WebApplicationContext webApplicationContext) {
+    public static ContextLoaderListener createSpringContextLoader(final WebApplicationContext webApplicationContext) {
         return new ContextLoaderListener() {
             @SuppressWarnings("unchecked")
             @Override
