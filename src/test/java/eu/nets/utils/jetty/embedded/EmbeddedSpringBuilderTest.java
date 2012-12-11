@@ -11,6 +11,7 @@ import org.springframework.ws.transport.http.MessageDispatcherServlet;
 import javax.servlet.ServletConfig;
 
 import static eu.nets.utils.jetty.embedded.EmbeddedSpringBuilder.*;
+import static eu.nets.utils.jetty.embedded.EmbeddedSpringWsBuilder.createMessageDispatcherServlet;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
