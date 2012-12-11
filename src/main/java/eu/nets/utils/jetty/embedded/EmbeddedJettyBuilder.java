@@ -345,7 +345,14 @@ public class EmbeddedJettyBuilder {
     public void createStandardClasspathResourceHandler(String subContextPath){
         boolean useCaches  = !devMode;
         createRootContextHandler(subContextPath).setResourceHandler(new ClasspathResourceHandler("/webapp", useCaches));
-
     }
+
+    /**
+     * @return true if the current process has been started with appassambler
+     */
+    public static boolean isStartedWithAppassembler(){
+        return System.getProperty("app.home") != null;  // Started with appassembly
+    }
+
 }
 
