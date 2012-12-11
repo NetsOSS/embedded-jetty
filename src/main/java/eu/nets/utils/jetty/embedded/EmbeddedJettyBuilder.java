@@ -48,6 +48,11 @@ public class EmbeddedJettyBuilder {
     private long initTime;
     List<HandlerBuilder> handlers = new ArrayList<HandlerBuilder>();
 
+    /**
+     * Create a new builder.
+     * @param context The context defining the root path and port of the application
+     * @param devMode true to run in development mode, which normally caches less content.
+     */
     public EmbeddedJettyBuilder(ContextPathConfig context, boolean devMode) {
         this.contextPath = context.getContextPath();
         this.port = context.getPort();
@@ -84,6 +89,11 @@ public class EmbeddedJettyBuilder {
 
         }
 
+        /**
+         * Adds an Event Listener to this servlet context, typically some implementation of ServletContextListener
+         * @param eventListener The event listener to add
+         * @return this builder
+         */
         public ServletContextHandlerBuilder addEventListener(EventListener eventListener) {
             handler.addEventListener(eventListener);
             return this;
@@ -129,6 +139,11 @@ public class EmbeddedJettyBuilder {
 
     }
 
+    /**
+     * Creates a HandlerBuilder that is mounted on top of the root path of this builder
+     * @param subPath The sub-path that will be appended, starting with a slash, or just an empty string for no subpath
+     * @return A handler builder. This can not be used for servlets, see #createRootServletContextHandler
+     */
     public HandlerBuilder createRootContextHandler(String subPath) {
         ContextHandler contextHandler = new ContextHandler();
         HandlerBuilder<ContextHandler> e = new HandlerBuilder<ContextHandler>(contextHandler);
@@ -138,6 +153,11 @@ public class EmbeddedJettyBuilder {
         return e;
     }
 
+    /**
+     * Creates a ServletContextHandlerBuilder that is mounted on top of the root path of this builder
+     * @param subPath The sub-path that will be appended, starting with a slash, or just an empty string for no subpath
+     * @return A handler builder
+     */
     public ServletContextHandlerBuilder createRootServletContextHandler(String subPath) {
         ServletContextHandler handler = getServletContextHandler();
         ServletContextHandlerBuilder e = new ServletContextHandlerBuilder(handler);
