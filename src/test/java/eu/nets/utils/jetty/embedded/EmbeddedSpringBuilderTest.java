@@ -21,7 +21,7 @@ public class EmbeddedSpringBuilderTest {
 
     @Test
     public void testCreateApplicationContext() throws Exception {
-        WebApplicationContext root = createApplicationContext(MyConfig.class, "root");
+        WebApplicationContext root = createApplicationContext("root", MyConfig.class);
         checkContext(root);
 
     }
@@ -41,7 +41,7 @@ public class EmbeddedSpringBuilderTest {
 
     @Test
     public void testCreateSpringContextLoader() throws Exception {
-        WebApplicationContext root = createApplicationContext(MyConfig.class, "root");
+        WebApplicationContext root = createApplicationContext("root", MyConfig.class);
         ContextLoaderListener springContextLoader = createSpringContextLoader(root);
         // Maybe create a mock context an init, unsure what we can get from that
         assertNotNull( springContextLoader);

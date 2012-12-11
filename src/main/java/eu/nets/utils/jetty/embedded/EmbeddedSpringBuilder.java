@@ -28,11 +28,11 @@ public class EmbeddedSpringBuilder {
         };
     }
 
-    public static WebApplicationContext createApplicationContext(final Class<?> classes, final String displayName) {
+    public static WebApplicationContext createApplicationContext(final String displayName, final Class... contextConfigLocation) {
         return new AnnotationConfigWebApplicationContext(){
             {
                 setDisplayName(displayName);
-                register( classes);
+                register( contextConfigLocation);
                 super.refresh();
             }
             @Override
