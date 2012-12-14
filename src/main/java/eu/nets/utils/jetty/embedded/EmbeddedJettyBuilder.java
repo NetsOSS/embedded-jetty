@@ -82,11 +82,16 @@ public class EmbeddedJettyBuilder {
         public ServletContextHandlerBuilder(ServletContextHandler handler) {
             super(handler);
             this.handler = handler;
+            setHttpCookieOnly(true);
         }
 
         public ServletHolderBuilder addServlet(Servlet servlet, String pathSpec) {
             return new ServletHolderBuilder(this, servlet, pathSpec);
+        }
 
+        public ServletContextHandlerBuilder setHttpCookieOnly(boolean httpCookieOnly){
+            handler.getSessionHandler().getSessionManager().getSessionCookieConfig().setHttpOnly(httpCookieOnly);
+            return this;
         }
 
         /**
