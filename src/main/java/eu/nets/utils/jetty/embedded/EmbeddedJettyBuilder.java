@@ -32,7 +32,7 @@ import static java.net.InetAddress.getLocalHost;
 
 /**
  * A jetty builder that can handle "all" jetty building needs with a fluent api ;)
- *
+ * <p/>
  * An embedded jetty builder accepts a root context path. All handlers added to the builder
  * are appended to this root path.
  *
@@ -50,6 +50,7 @@ public class EmbeddedJettyBuilder {
 
     /**
      * Create a new builder.
+     *
      * @param context The context defining the root path and port of the application
      * @param devMode true to run in development mode, which normally caches less content.
      */
@@ -89,13 +90,14 @@ public class EmbeddedJettyBuilder {
             return new ServletHolderBuilder(this, servlet, pathSpec);
         }
 
-        public ServletContextHandlerBuilder setHttpCookieOnly(boolean httpCookieOnly){
+        public ServletContextHandlerBuilder setHttpCookieOnly(boolean httpCookieOnly) {
             handler.getSessionHandler().getSessionManager().getSessionCookieConfig().setHttpOnly(httpCookieOnly);
             return this;
         }
 
         /**
          * Adds an Event Listener to this servlet context, typically some implementation of ServletContextListener
+         *
          * @param eventListener The event listener to add
          * @return this builder
          */
@@ -146,6 +148,7 @@ public class EmbeddedJettyBuilder {
 
     /**
      * Creates a HandlerBuilder that is mounted on top of the root path of this builder
+     *
      * @param subPath The sub-path that will be appended, starting with a slash, or just an empty string for no subpath
      * @return A handler builder. This can not be used for servlets, see #createRootServletContextHandler
      */
@@ -160,6 +163,7 @@ public class EmbeddedJettyBuilder {
 
     /**
      * Creates a ServletContextHandlerBuilder that is mounted on top of the root path of this builder
+     *
      * @param subPath The sub-path that will be appended, starting with a slash, or just an empty string for no subpath
      * @return A handler builder
      */
@@ -180,7 +184,7 @@ public class EmbeddedJettyBuilder {
         }
     }
 
-    public ServletContextHandler getServletContextHandler() {
+    private ServletContextHandler getServletContextHandler() {
         return new ServletContextHandler(null, contextPath, ServletContextHandler.SESSIONS) {
             @Override
             protected void startContext() throws Exception {
@@ -199,7 +203,7 @@ public class EmbeddedJettyBuilder {
         Connector connector = new SelectChannelConnector();
         connector.setPort(port);
 
-        if (devMode){
+        if (devMode) {
             connector.setMaxIdleTime(1000000);
         } else {
             connector.setMaxIdleTime(30000);
@@ -244,23 +248,28 @@ public class EmbeddedJettyBuilder {
         }
     }
 
+    Server buildJetty() {
+        HandlerList hl = new HandlerList();
+        for (HandlerBuilder handler : handlers) {
+            hl.addHandler(handler.getHandler());
+        }
+
+        final Handler handlerToUse;
+        if (secureWrap != null) {
+            secureWrap.setHandler(hl);
+            handlerToUse = secureWrap;
+        } else {
+            handlerToUse = hl;
+        }
+
+        server.setHandler(handlerToUse);
+        return server;
+    }
+
     public void startJetty() {
         this.initTime = System.currentTimeMillis();
+        buildJetty();
         try {
-            HandlerList hl = new HandlerList();
-            for (HandlerBuilder handler : handlers) {
-                hl.addHandler(handler.getHandler());
-            }
-
-            final Handler handlerToUse;
-            if (secureWrap != null) {
-                secureWrap.setHandler(hl);
-                handlerToUse = secureWrap;
-            } else {
-                handlerToUse = hl;
-            }
-
-            server.setHandler(handlerToUse);
             server.start();
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -342,8 +351,8 @@ public class EmbeddedJettyBuilder {
     }
 
 
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    public void startBrowserStopWithAnyKey(String url){
+    @SuppressWarnings({"ResultOfMethodCallIgnored", "UnusedDeclaration"})
+    public void startBrowserStopWithAnyKey(String url) {
         System.out.println(">>> STARTING EMBEDDED JETTY SERVER, PRESS ANY KEY TO STOP");
         try {
             getDesktop().browse(getUri(url));
@@ -365,19 +374,24 @@ public class EmbeddedJettyBuilder {
 
     /**
      * Creates a standard resource handler that exposes all resources under /webapp as web content
+     *
      * @param subContextPath The path to map the resources at
      */
-    public void createStandardClasspathResourceHandler(String subContextPath){
-        boolean useCaches  = !devMode;
+    public void createStandardClasspathResourceHandler(String subContextPath) {
+        boolean useCaches = !devMode;
         createRootContextHandler(subContextPath).setResourceHandler(new ClasspathResourceHandler("/webapp", useCaches));
     }
 
     /**
      * @return true if the current process has been started with appassambler
      */
-    public static boolean isStartedWithAppassembler(){
+    public static boolean isStartedWithAppassembler() {
         return System.getProperty("app.home") != null;  // Started with appassembly
     }
 
+    Server getServer() {
+        return server;
+    }
 }
+
 
