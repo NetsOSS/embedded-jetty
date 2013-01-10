@@ -18,6 +18,7 @@
 
     <body>
         <menu name="Embedded Jetty">
+            <item name="Overview" href="index.html"/>
             <item name="Deploying to Nexus" href="deploying.html"/>
         </menu>
 
