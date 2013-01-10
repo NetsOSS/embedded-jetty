@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Embedded Jetty">
+
+    <skin>
+        <groupId>org.apache.maven.skins</groupId>
+        <artifactId>maven-fluido-skin</artifactId>
+        <version>1.2.1</version>
+    </skin>
+
+    <bannerLeft>
+        <name>Embedded Jetty</name>
+        <src>images/nets.png</src>
+    </bannerLeft>
+
+    <bannerRight>
+        <name>Embedded Jetty</name>
+    </bannerRight>
+
+    <body>
+        <menu name="Embedded Jetty">
+            <item name="Deploying to Nexus" href="deploying.html"/>
+        </menu>
+
+        <menu ref="modules"/>
+        <menu ref="reports"/>
+    </body>
+
+</project>
