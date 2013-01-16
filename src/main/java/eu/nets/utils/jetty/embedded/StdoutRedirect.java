@@ -14,13 +14,13 @@ import static com.google.common.base.Splitter.on;
 public class StdoutRedirect {
 
     public static void tieSystemOutAndErrToLog() {
-        //TODO: this shameless ripoff causes an infinite loop ehn log4j has not been properly initialized...
-        //log4j -> logs to standard-err when it finds no appenders, standard err has been redirected using slf 4j-----
-        //and here we go...
-        // Use threadlocal to signal that we're already logging ?
 
-        //System.setOut(createLoggingProxy(System.out));
-        //System.setErr(createLoggingProxy(System.err));
+        // Be sure log4j has been initialized here.
+        //  this shameless ripoff causes an infinite loop ehn log4j has not been properly initialized...
+        //log4j -> logs to standard-err when it finds no appenders, standard err has been redirected using slf 4j
+        //and here we go...
+        System.setOut(createLoggingProxy(System.out));
+        System.setErr(createLoggingProxy(System.err));
     }
 
     private static PrintStream createLoggingProxy(final PrintStream realPrintStream) {
