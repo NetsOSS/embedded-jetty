@@ -25,12 +25,13 @@ public class EmbeddedWicketBuilder {
     private static EmbeddedJettyBuilder.ServletContextHandlerBuilder addWicket(EmbeddedJettyBuilder.ServletContextHandlerBuilder handlerBuilder,
                                                                         Class <? extends WebApplication> wicketApplication,
                                                                         boolean development) {
-            String filterMapping = "/*";
+            String pathSpec = "/*";
             WicketServlet wicketServlet = new WicketServlet();
-            handlerBuilder.addServlet(wicketServlet, filterMapping)
+            handlerBuilder.addServlet(wicketServlet )
+                  .mountAtPath(pathSpec)
                     .setInitParameter("applicationFactoryClassName", org.apache.wicket.spring.SpringWebApplicationFactory.class.getName())
                     .setInitParameter("applicationClassName", wicketApplication.getName())
-                    .setInitParameter("filterMappingUrlPattern", filterMapping)
+                    .setInitParameter("filterMappingUrlPattern", pathSpec)
                     .setInitParameter("wicket.configuration",
                             development ? RuntimeConfigurationType.DEVELOPMENT.name() :  RuntimeConfigurationType.DEPLOYMENT.name());
         return handlerBuilder;

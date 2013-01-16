@@ -86,10 +86,6 @@ public class EmbeddedJettyBuilder {
             setHttpCookieOnly(true);
         }
 
-        public ServletHolderBuilder addServlet(Servlet servlet, String pathSpec) {
-            return new ServletHolderBuilder(this, servlet, pathSpec);
-        }
-
         public ServletHolderBuilder addServlet(Servlet servlet) {
             return new ServletHolderBuilder(this, servlet );
         }
@@ -124,12 +120,6 @@ public class EmbeddedJettyBuilder {
     public class ServletHolderBuilder {
         private final ServletHolder sh;
         private final EmbeddedJettyBuilder.ServletContextHandlerBuilder servletContext;
-
-        public ServletHolderBuilder(ServletContextHandlerBuilder servletContext, Servlet servlet, String pathSpec) {
-            sh = new ServletHolder(servlet);
-            this.servletContext = servletContext;
-            mountAtPath(pathSpec);
-        }
 
         public ServletHolderBuilder(ServletContextHandlerBuilder servletContext, Servlet servlet) {
             sh = new ServletHolder(servlet);
