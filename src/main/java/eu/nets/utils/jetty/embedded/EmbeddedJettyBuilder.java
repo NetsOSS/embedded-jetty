@@ -127,6 +127,11 @@ public class EmbeddedJettyBuilder {
             mountAtPath(pathSpec);
         }
 
+        public ServletHolderBuilder(ServletContextHandlerBuilder servletContext, Servlet servlet) {
+            sh = new ServletHolder(servlet);
+            this.servletContext = servletContext;
+        }
+
         public ServletHolderBuilder mountAtPath(String pathSpec) {
             this.servletContext.handler.addServlet(sh, pathSpec);
             return this;
