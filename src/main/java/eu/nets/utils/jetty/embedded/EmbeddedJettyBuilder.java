@@ -90,6 +90,10 @@ public class EmbeddedJettyBuilder {
             return new ServletHolderBuilder(this, servlet, pathSpec);
         }
 
+        public ServletHolderBuilder addServlet(Servlet servlet) {
+            return new ServletHolderBuilder(this, servlet );
+        }
+
         public ServletContextHandlerBuilder setHttpCookieOnly(boolean httpCookieOnly) {
             handler.getSessionHandler().getSessionManager().getSessionCookieConfig().setHttpOnly(httpCookieOnly);
             return this;
