@@ -16,10 +16,7 @@ import org.eclipse.jetty.util.security.Constraint;
 
 import javax.servlet.Servlet;
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.Socket;
-import java.net.URI;
-import java.net.UnknownHostException;
+import java.net.*;
 import java.util.ArrayList;
 import java.util.EventListener;
 import java.util.LinkedList;
@@ -197,7 +194,25 @@ public class EmbeddedJettyBuilder {
         };
     }
 
+    private void failIfPortIsTaken(int port){
+        // SelectChannelConnector allows multiple processes to
+        try {
+            ServerSocket serverSocket = new ServerSocket(port);
+            serverSocket.close();
+        } catch (IOException e) {
+            throw new RuntimeException("Port " + port + " is already in use");
+        }
+
+
+    }
+
     private Server createServer(int port, boolean devMode) {
+        // The NIO connectors permit one process to queue up for the socket.
+        // (So when the owning process terminates, the new takes over)
+        // While there may be a decent production case for this, it is error prone on local workstation.
+        // todo: Determine if we need to support this for production purposes.
+
+        failIfPortIsTaken(port);
         Server server = new Server();
         Connector connector = new SelectChannelConnector();
         connector.setPort(port);
