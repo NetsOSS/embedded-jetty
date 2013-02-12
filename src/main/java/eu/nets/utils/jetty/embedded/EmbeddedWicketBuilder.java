@@ -14,19 +14,10 @@ import java.util.EventListener;
  */
 public class EmbeddedWicketBuilder {
 
-    public static void addWicketHandler(EmbeddedJettyBuilder embeddedJettyBuilder,
+    public static EmbeddedJettyBuilder.ServletContextHandlerBuilder addWicketHandler(EmbeddedJettyBuilder embeddedJettyBuilder,
                                                                                      String contextPath,
                                                                                      EventListener springContextloader,
                                                                                      Class<? extends WebApplication> wicketApplication,
-                                                                                     boolean development){
-        addWicketHandler(embeddedJettyBuilder, contextPath, springContextloader, wicketApplication, null, development);
-    }
-
-    public static void addWicketHandler(EmbeddedJettyBuilder embeddedJettyBuilder,
-                                                                                     String contextPath,
-                                                                                     EventListener springContextloader,
-                                                                                     Class<? extends WebApplication> wicketApplication,
-                                                                                     ResourceHandler resourceHandler,
                                                                                      boolean development){
         EmbeddedJettyBuilder.ServletContextHandlerBuilder wicketHandler = embeddedJettyBuilder.createRootServletContextHandler(contextPath)
                 .setClassLoader(Thread.currentThread().getContextClassLoader())
@@ -40,7 +31,8 @@ public class EmbeddedWicketBuilder {
                 .setInitParameter(WicketFilter.FILTER_MAPPING_PARAM, pathSpec)
                 .setInitParameter("wicket.configuration",
                         development ? RuntimeConfigurationType.DEVELOPMENT.name() :  RuntimeConfigurationType.DEPLOYMENT.name());
-        if (resourceHandler != null) wicketHandler.setResourceHandler(resourceHandler);
+
+        return wicketHandler;
     }
 
 }

@@ -391,13 +391,12 @@ public class EmbeddedJettyBuilder {
     }
 
     /**
-     * Creates a standard resource handler that exposes all resources under /webapp as web content
+     * Creates a nets standard resource handler, that can be attached using setResourceHandler
      *
-     * @param subContextPath The path to map the resources at
      */
-    public void createStandardClasspathResourceHandler(String subContextPath) {
+    public ClasspathResourceHandler createNetsStandardClasspathResourceHandler() {
         boolean useCaches = !devMode;
-        createRootContextHandler(subContextPath).setResourceHandler(new ClasspathResourceHandler("/webapp", useCaches));
+        return new ClasspathResourceHandler("/webapp", useCaches);
     }
 
     /**
