@@ -112,6 +112,10 @@ public class EmbeddedJettyBuilder {
             handler.setClassLoader(classLoader);
             return this;
         }
+
+        public void setResourceHandler(){
+
+        }
     }
 
     public class ServletHolderBuilder {
