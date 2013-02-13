@@ -69,8 +69,9 @@ public class EmbeddedJettyBuilder {
             return handler;
         }
 
-        public void setResourceHandler(ResourceHandler resourceHandler) {
+        public HandlerBuilder<T> setResourceHandler(ResourceHandler resourceHandler) {
             ((ContextHandler) handler).setHandler(resourceHandler);
+            return this;
         }
     }
 
@@ -112,10 +113,11 @@ public class EmbeddedJettyBuilder {
             handler.setClassLoader(classLoader);
             return this;
         }
-
-        public void setResourceHandler(){
-
+        public ServletContextHandlerBuilder setResourceHandler(ResourceHandler resourceHandler) {
+            handler.setHandler(resourceHandler);
+            return this;
         }
+
     }
 
     public class ServletHolderBuilder {
