@@ -8,19 +8,19 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.*;
 import org.eclipse.jetty.server.nio.SelectChannelConnector;
 import org.eclipse.jetty.server.ssl.SslSocketConnector;
+import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.log.JavaUtilLog;
 import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.util.security.Constraint;
 
+import javax.servlet.DispatcherType;
+import javax.servlet.Filter;
 import javax.servlet.Servlet;
 import java.io.IOException;
 import java.net.*;
-import java.util.ArrayList;
-import java.util.EventListener;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import static java.awt.Desktop.getDesktop;
 import static java.lang.String.format;
@@ -103,6 +103,13 @@ public class EmbeddedJettyBuilder {
             handler.addEventListener(eventListener);
             return this;
         }
+
+        public ServletContextHandlerBuilder addFilter(Filter filter, String pathSpec, EnumSet<DispatcherType> dispatches) {
+            FilterHolder fh = new FilterHolder(filter);
+            handler.addFilter(fh, pathSpec, dispatches);
+            return this;
+        }
+
 
         public ServletContextHandlerBuilder setSecurityHandler(SecurityHandler securityHandler) {
             handler.setSecurityHandler(securityHandler);
