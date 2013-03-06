@@ -34,27 +34,32 @@ public class EmbeddedSpringBuilder {
 
     /**
      * Instantiates an application context for javaconfig classes.
-     *
+     * <p/>
      * This context initializes in a custom manner so it can be passed from the outside into
      * jetty servlet contexts. Since they normally think they are self-contained, they try
      * to do the initialization themselves.
      *
-     * @param displayName The name of the spring context, mostly used when debugging to identify contexts.
+     * @param displayName           The name of the spring context, mostly used when debugging to identify contexts.
      * @param contextConfigLocation The spring context config locations
      * @return A fully configured web application context
      */
     public static WebApplicationContext createApplicationContext(final String displayName, final Class... contextConfigLocation) {
         return new AnnotationConfigWebApplicationContext() {
+            boolean refreshed = false;
+
             {
                 setDisplayName(displayName);
                 register(contextConfigLocation);
-                super.refresh();
             }
 
             @Override
             public void refresh() throws BeansException, IllegalStateException {
-                // We do this to avoid the spring stuff re-initializing
-                // the container once the servlet context is loaded
+                if (!refreshed) {
+                    // We do this to avoid the spring stuff re-initializing
+                    // the container once the servlet context is loaded
+                    refreshed = true;
+                    super.refresh();
+                }
             }
         };
     }

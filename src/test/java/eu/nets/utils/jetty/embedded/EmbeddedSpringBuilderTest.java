@@ -4,11 +4,13 @@ import org.junit.Test;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.mock.web.MockServletConfig;
+import org.springframework.mock.web.MockServletContext;
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.ws.transport.http.MessageDispatcherServlet;
 
 import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 
 import static eu.nets.utils.jetty.embedded.EmbeddedSpringBuilder.*;
 import static eu.nets.utils.jetty.embedded.EmbeddedSpringWsBuilder.createMessageDispatcherServlet;
@@ -23,6 +25,9 @@ public class EmbeddedSpringBuilderTest {
     @Test
     public void testCreateApplicationContext() throws Exception {
         WebApplicationContext root = createApplicationContext("root", MyConfig.class);
+        ContextLoaderListener springContextLoader = createSpringContextLoader(root);
+        ServletContext sc = new MockServletContext();
+        springContextLoader.initWebApplicationContext(sc);
         checkContext(root);
 
     }
