@@ -4,3 +4,19 @@
 Deferred initialization of web app context until servletcontext was actually available, to fix
 issue with spring mvc.
 
+0.14
+======
+
+The block
+          try {
+                   ejb.startJetty();
+                   ejb.verifyServerStartup();
+               } catch (Exception e) {
+                   //noinspection ThrowableResultOfMethodCallIgnored
+                   propagate(e);
+               }
+
+
+    can now be simplified to ejb.startJetty();
+
+

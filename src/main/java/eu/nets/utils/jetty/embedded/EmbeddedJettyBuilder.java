@@ -23,6 +23,7 @@ import java.net.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import static com.google.common.base.Throwables.propagate;
 import static java.awt.Desktop.getDesktop;
 import static java.lang.String.format;
 import static java.net.InetAddress.getLocalHost;
@@ -294,7 +295,7 @@ public class EmbeddedJettyBuilder {
         return server;
     }
 
-    public void startJetty() {
+    public void justStartJetty() {
         this.initTime = System.currentTimeMillis();
         buildJetty();
         try {
@@ -304,12 +305,17 @@ public class EmbeddedJettyBuilder {
         }
     }
 
-    public void startJettyWithMessage() {
+    public void startJetty() {
         getLogger().info("************************** Server starting: {} **************************",
                              new SimpleDateFormat("[yyyy-MM-dd HH:mm:ss.SSS]").format(new Date()));
-        startJetty();
+        try {
+            justStartJetty();
+            verifyServerStartup();
+        } catch (Exception e) {
+            //noinspection ThrowableResultOfMethodCallIgnored
+            propagate(e);
+        }
     }
-
 
     public void stopJetty() {
         try {

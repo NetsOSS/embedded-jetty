@@ -56,7 +56,7 @@ public class EmbeddedJettyBuilderTest {
     public void testStartStopJetty() throws Exception {
 
         EmbeddedJettyBuilder builder = getBuilder();
-        builder.startJetty();
+        builder.justStartJetty();
         // Maybe assert that port is taken
         try {
             new ServerSocket(port);
