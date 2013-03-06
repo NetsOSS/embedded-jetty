@@ -20,6 +20,7 @@ import javax.servlet.Filter;
 import javax.servlet.Servlet;
 import java.io.IOException;
 import java.net.*;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static java.awt.Desktop.getDesktop;
@@ -303,6 +304,13 @@ public class EmbeddedJettyBuilder {
         }
     }
 
+    public void startJettyWithMessage() {
+        getLogger().info("************************** Server starting: {} **************************",
+                             new SimpleDateFormat("[yyyy-MM-dd HH:mm:ss.SSS]").format(new Date()));
+        startJetty();
+    }
+
+
     public void stopJetty() {
         try {
             server.stop();
@@ -339,7 +347,7 @@ public class EmbeddedJettyBuilder {
         try {
             return InetAddress.getLocalHost().getHostAddress();
         } catch (UnknownHostException e) {
-            getLogger().info("Unable to retrieve hostname", e);
+            getLoggerS().info("Unable to retrieve hostname", e);
             return "localhost";
         }
     }
@@ -365,10 +373,13 @@ public class EmbeddedJettyBuilder {
         logger.info(format("Server started on http://%s:%d%s in %dms", ip, port, contextPath, startupTime));
     }
 
-    protected static JavaUtilLog getLogger() {
+    protected static JavaUtilLog getLoggerS() {
         return new JavaUtilLog(EmbeddedJettyBuilder.class.getName());
     }
 
+    protected JavaUtilLog getLogger() {
+        return new JavaUtilLog(this.getClass().getName());
+    }
 
     public static ConstraintMapping getConstraintMapping(Constraint constraint, String pathSpec) {
         ConstraintMapping cm2 = new ConstraintMapping();
