@@ -1,0 +1,6 @@
+0.13
+======
+
+Deferred initialization of web app contetx until servletcontext was actually available, to fix
+issue with spring mvc.
+
