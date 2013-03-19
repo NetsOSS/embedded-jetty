@@ -7,6 +7,10 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.nio.charset.Charset;
 
+/**
+ * Todo: Think about this design. It is inherently not a very good design, since it
+ * does two things: Both apply the config and expose it through ContextPathConfig.
+ */
 public class PropertiesFileConfig implements ContextPathConfig {
 
     private static final Logger log = LoggerFactory.getLogger(PropertiesFileConfig.class);
