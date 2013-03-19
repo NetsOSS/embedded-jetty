@@ -17,12 +17,28 @@ public class PropertiesFileConfig implements ContextPathConfig {
     }
 
     private void applyEnvironment() {
+        InputStream is;
         File envFile = new File(getBasedir(), "environment.properties");
-        log.info("Loading properties from " + envFile.getAbsolutePath());
+        // zOMG what a dirty block of code.
+        if (envFile.exists()){
+            try {
+                is = new FileInputStream(envFile);
+                log.info("Loading properties from " + envFile.getAbsolutePath());
+            } catch (FileNotFoundException e) {
+                log.warn("Could not load 'environment.properties', using system defaults");
+                return;
+            }
+        } else {
+            is = this.getClass().getResourceAsStream("/environment.properties");
+            if (is == null) {
+                log.warn("Could not load 'environment.properties' from file system or classpath, using system defaults");
+            }
+            log.info("Loading properties from classpath resource environment.properties");
+        }
 
         try {
-            System.getProperties().load(new BufferedReader(
-                    new InputStreamReader(new FileInputStream(envFile), Charset.forName("ISO-8859-1"))));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(is, Charset.forName("ISO-8859-1")));
+            System.getProperties().load(reader);
         } catch (IOException e) {
             log.warn("Could not load 'environment.properties', using system defaults");
         }

@@ -1,8 +1,11 @@
-0.13
+0.16
 ======
+PropertiesFileConfig noew searches both local file system (old behaviour) and the root of the classpath
+(new behaviour) for environment.properties. Local file system has precedence
 
-Deferred initialization of web app context until servletcontext was actually available, to fix
-issue with spring mvc.
+0.15
+======
+The capture of stdout/stderr did not properly diffrentiate between the two.
 
 0.14
 ======
@@ -19,4 +22,10 @@ The block
 
     can now be simplified to ejb.startJetty();
 
+
+0.13
+======
+
+Deferred initialization of web app context until servletcontext was actually available, to fix
+issue with spring mvc.
 
