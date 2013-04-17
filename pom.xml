@@ -88,8 +88,13 @@
             <artifactId>jetty-security</artifactId>
             <version>${jetty.version}</version>
         </dependency>
-
-        <!-- Optional deps. Client can include in any version they prefer -->
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>1.7.2</version>
+        <scope>provided</scope>
+      </dependency>
+      <!-- Optional deps. Client can include in any version they prefer -->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>

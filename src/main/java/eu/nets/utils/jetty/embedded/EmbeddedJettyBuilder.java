@@ -21,7 +21,12 @@ import javax.servlet.Servlet;
 import java.io.IOException;
 import java.net.*;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.EnumSet;
+import java.util.EventListener;
+import java.util.LinkedList;
+import java.util.List;
 
 import static com.google.common.base.Throwables.propagate;
 import static java.awt.Desktop.getDesktop;
@@ -152,7 +157,7 @@ public class EmbeddedJettyBuilder {
     }
 
     private void setPath(ContextHandler handler, String usePath) {
-        getLogger().info(">>>> Context handler added at " + usePath + " <<<<");
+        Logger.info( this.getClass(), ">>>> Context handler added at " + usePath + " <<<<" );
         handler.setContextPath(usePath);
 
     }
@@ -306,8 +311,8 @@ public class EmbeddedJettyBuilder {
     }
 
     public void startJetty() {
-        getLogger().info("************************** Server starting: {} **************************",
-                             new SimpleDateFormat("[yyyy-MM-dd HH:mm:ss.SSS]").format(new Date()));
+        Logger.info( this.getClass(), "************************** Server starting: {} **************************",
+                     new SimpleDateFormat( "[yyyy-MM-dd HH:mm:ss.SSS]" ).format( new Date() ) );
         try {
             justStartJetty();
             verifyServerStartup();
