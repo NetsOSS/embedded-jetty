@@ -1,5 +1,6 @@
 package eu.nets.utils.jetty.embedded;
 
+import com.google.common.base.Predicates;
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.SecurityHandler;
 import org.eclipse.jetty.server.Connector;
@@ -92,7 +93,7 @@ public class EmbeddedJettyBuilder {
         }
 
         public ServletHolderBuilder addServlet(Servlet servlet) {
-            return new ServletHolderBuilder(this, servlet );
+            return new ServletHolderBuilder(this, servlet);
         }
 
         public ServletContextHandlerBuilder setHttpCookieOnly(boolean httpCookieOnly) {
@@ -127,6 +128,7 @@ public class EmbeddedJettyBuilder {
             handler.setClassLoader(classLoader);
             return this;
         }
+
         public ServletContextHandlerBuilder setResourceHandler(ResourceHandler resourceHandler) {
             handler.setHandler(resourceHandler);
             return this;
@@ -157,7 +159,7 @@ public class EmbeddedJettyBuilder {
     }
 
     private void setPath(ContextHandler handler, String usePath) {
-        Logger.info( this.getClass(), ">>>> Context handler added at " + usePath + " <<<<" );
+        Logger.info(this.getClass(), ">>>> Context handler added at " + usePath + " <<<<");
         handler.setContextPath(usePath);
 
     }
@@ -214,7 +216,7 @@ public class EmbeddedJettyBuilder {
         };
     }
 
-    private void failIfPortIsTaken(int port){
+    private void failIfPortIsTaken(int port) {
         // SelectChannelConnector allows multiple processes to
         try {
             ServerSocket serverSocket = new ServerSocket(port);
@@ -311,8 +313,8 @@ public class EmbeddedJettyBuilder {
     }
 
     public void startJetty() {
-        Logger.info( this.getClass(), "************************** Server starting: {} **************************",
-                     new SimpleDateFormat( "[yyyy-MM-dd HH:mm:ss.SSS]" ).format( new Date() ) );
+        Logger.info(this.getClass(), "************************** Server starting: {} **************************",
+                new SimpleDateFormat("[yyyy-MM-dd HH:mm:ss.SSS]").format(new Date()));
         try {
             justStartJetty();
             verifyServerStartup();
@@ -423,7 +425,6 @@ public class EmbeddedJettyBuilder {
 
     /**
      * Creates a nets standard resource handler, that can be attached using setResourceHandler
-     *
      */
     public ClasspathResourceHandler createNetsStandardClasspathResourceHandler() {
         boolean useCaches = !devMode;
@@ -434,7 +435,17 @@ public class EmbeddedJettyBuilder {
      * @return true if the current process has been started with appassambler
      */
     public static boolean isStartedWithAppassembler() {
-        return System.getProperty("app.home") != null;  // Started with appassembly
+        final String[] appAssemblerProperties = {
+                "app.home",
+                "app.name",
+                "app.repo",
+        };
+        for (String appAssemblerProperty : appAssemblerProperties) {
+            if (System.getProperty(appAssemblerProperty) != null) {
+                return true;
+            }
+        }
+        return false;
     }
 
     Server getServer() {
