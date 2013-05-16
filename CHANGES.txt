@@ -1,3 +1,15 @@
+0.19
+====
+Added ServerUtil from shared-server because we need it. It's the only thing we need.
+
+0.18
+===
+Fixed bug in isStartedWithAppassembler
+
+0.17
+====
+Handle slf4j gracefully
+
 0.16
 ======
 PropertiesFileConfig noew searches both local file system (old behaviour) and the root of the classpath
