@@ -51,7 +51,7 @@ public class ServerUtil {
 
     /**
      * Leser properties fra classpath og vil overlaste i reverse order, slik at
-     * classpath reverse rekkefølge styrer hvilke props som gjelder.
+     * classpath reverse order styrer hvilke props som gjelder.
      *
      * @param configFile the file to read properties from
      * @return Properties med properties i overridden form
