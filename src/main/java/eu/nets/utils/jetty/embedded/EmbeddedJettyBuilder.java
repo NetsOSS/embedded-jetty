@@ -1,14 +1,12 @@
 package eu.nets.utils.jetty.embedded;
 
-import com.google.common.base.Predicates;
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.SecurityHandler;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.*;
-import org.eclipse.jetty.server.nio.SelectChannelConnector;
-import org.eclipse.jetty.server.ssl.SslSocketConnector;
 import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
@@ -21,6 +19,8 @@ import javax.servlet.Filter;
 import javax.servlet.Servlet;
 import java.io.IOException;
 import java.net.*;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -236,17 +236,17 @@ public class EmbeddedJettyBuilder {
 
         failIfPortIsTaken(port);
         Server server = new Server();
-        Connector connector = new SelectChannelConnector();
+        ServerConnector connector = new ServerConnector(server);
         connector.setPort(port);
 
         if (devMode) {
-            connector.setMaxIdleTime(1000000);
+            connector.setIdleTimeout(1000000);
         } else {
-            connector.setMaxIdleTime(30000);
+            connector.setIdleTimeout(30000);
             server.setStopAtShutdown(true);
-            server.setGracefulShutdown(2000);
+            server.setStopTimeout(2000);
         }
-        connector.setMaxIdleTime(10000000);
+        connector.setIdleTimeout(10000000);
 
         //connector.setSoLingerTime(-1);
         server.addConnector(connector);
@@ -270,12 +270,17 @@ public class EmbeddedJettyBuilder {
             org.eclipse.jetty.util.ssl.SslContextFactory factory = new org.eclipse.jetty.util.ssl.SslContextFactory();
             factory.setKeyStoreResource(keystore);
             factory.setKeyStorePassword("wicket");
-            factory.setTrustStore("/keyStore");
+            try {
+                KeyStore ks = KeyStore.getInstance("/keyStore");
+                factory.setTrustStore(ks);
+            } catch (KeyStoreException e) {
+                throw new RuntimeException(e);
+            }
             factory.setKeyManagerPassword("wicket");
-            SslSocketConnector sslConnector = new SslSocketConnector(factory);
-            sslConnector.setMaxIdleTime(timeout);
+            ServerConnector sslConnector = new ServerConnector(server, factory);
+            sslConnector.setIdleTimeout(timeout);
             sslConnector.setPort(8443);
-            sslConnector.setAcceptors(4);
+            sslConnector.setAcceptQueueSize(4);
             server.addConnector(sslConnector);
 
             System.out.println("SSL access to the quickstart has been enabled on port 8443");
