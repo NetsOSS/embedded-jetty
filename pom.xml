@@ -10,7 +10,7 @@
     <groupId>eu.nets.utils.jetty</groupId>
     <artifactId>embedded-jetty</artifactId>
     <packaging>jar</packaging>
-    <version>0.19-SNAPSHOT</version>
+    <version>0.19</version>
     <name>embedded-jetty</name>
     <description>Code for starting embedded Jetty.</description>
 
