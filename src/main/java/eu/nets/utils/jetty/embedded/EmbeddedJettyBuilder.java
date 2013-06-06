@@ -10,6 +10,7 @@ import org.eclipse.jetty.server.handler.*;
 import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.util.component.LifeCycle;
 import org.eclipse.jetty.util.log.JavaUtilLog;
 import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.util.security.Constraint;
@@ -455,6 +456,10 @@ public class EmbeddedJettyBuilder {
 
     Server getServer() {
         return server;
+    }
+
+    public void addLifecycleListener(LifeCycle.Listener listener){
+        server.addLifeCycleListener(listener);
     }
 }
 
