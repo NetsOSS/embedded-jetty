@@ -2,7 +2,6 @@ package eu.nets.utils.jetty.embedded;
 
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.SecurityHandler;
-import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
@@ -204,17 +203,7 @@ public class EmbeddedJettyBuilder {
     }
 
     private ServletContextHandler getServletContextHandler() {
-        return new ServletContextHandler(null, contextPath, ServletContextHandler.SESSIONS) {
-            @Override
-            protected void startContext() throws Exception {
-                try {
-                    super.startContext();
-                } catch (Exception e) {
-                    startupExceptions.add(e);
-                    throw e;
-                }
-            }
-        };
+        return new ServletContextHandlerWithExceptions(contextPath, startupExceptions);
     }
 
     private void failIfPortIsTaken(int port) {
@@ -461,6 +450,7 @@ public class EmbeddedJettyBuilder {
     public void addLifecycleListener(LifeCycle.Listener listener){
         server.addLifeCycleListener(listener);
     }
+
 }
 
 
