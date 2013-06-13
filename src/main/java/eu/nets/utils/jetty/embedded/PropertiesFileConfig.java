@@ -32,6 +32,7 @@ public class PropertiesFileConfig implements ContextPathConfig {
             is = this.getClass().getResourceAsStream("/environment.properties");
             if (is == null) {
                 Logger.warn(this.getClass(), "Could not load 'environment.properties' from file system or classpath, using system defaults");
+                return;
             }
             Logger.info(this.getClass(), "Loading properties from classpath resource environment.properties");
         }
