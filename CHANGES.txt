@@ -20,6 +20,10 @@ Added support for lifecycle listeners
 ====
 Jetty 9 version.
 
+0.20
+====
+Jetty8 version that is aligned with 1.2
+
 0.19
 ====
 Added ServerUtil from shared-server because we need it. It's the only thing we need.
