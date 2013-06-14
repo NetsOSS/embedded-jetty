@@ -13,6 +13,7 @@ import org.eclipse.jetty.util.component.LifeCycle;
 import org.eclipse.jetty.util.log.JavaUtilLog;
 import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.util.security.Constraint;
+import org.eclipse.jetty.util.thread.QueuedThreadPool;
 
 import javax.servlet.DispatcherType;
 import javax.servlet.Filter;
@@ -63,7 +64,7 @@ public class EmbeddedJettyBuilder {
         this.contextPath = context.getContextPath();
         this.port = context.getPort();
         this.devMode = devMode;
-        server = createServer(port, devMode);
+        server = createServer(port, devMode, Boolean.getBoolean("embedded.jetty.daemon"));
     }
 
     public static class HandlerBuilder<T extends Handler> {
@@ -218,14 +219,16 @@ public class EmbeddedJettyBuilder {
 
     }
 
-    private Server createServer(int port, boolean devMode) {
+    private Server createServer(int port, boolean devMode, boolean daemon) {
         // The NIO connectors permit one process to queue up for the socket.
         // (So when the owning process terminates, the new takes over)
         // While there may be a decent production case for this, it is error prone on local workstation.
         // todo: Determine if we need to support this for production purposes.
 
         failIfPortIsTaken(port);
-        Server server = new Server();
+        QueuedThreadPool queuedThreadPool = new QueuedThreadPool();
+        queuedThreadPool.setDaemon(daemon);
+        Server server = new Server(queuedThreadPool);
         ServerConnector connector = new ServerConnector(server);
         connector.setPort(port);
 
