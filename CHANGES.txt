@@ -6,7 +6,9 @@ This would permit something like:
 
 mvn org.codehaus.mojo:exec-maven-plugin:1.2.1:java -Dexec.mainClass=eu.nets.vas.StartJetty -Dembedded.jetty.daemon=false
 
-Which will start your jetty stater and keep it running for the duration of your build
+Which will start your jetty starter and keep it running for the duration of your build.
+
+Make sure your application also uses daemon threads or it won't terminate.
 
 1.1
 ===
