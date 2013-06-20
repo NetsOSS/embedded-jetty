@@ -1,10 +1,9 @@
 package eu.nets.utils.jetty.embedded;
 
+import eu.nets.utils.jetty.embedded.sharedserver.util.ServerUtil;
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.SecurityHandler;
-import org.eclipse.jetty.server.Handler;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.server.handler.*;
 import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
@@ -52,6 +51,8 @@ public class EmbeddedJettyBuilder {
     private IPAccessHandler secureWrap;
     private final LinkedList<Exception> startupExceptions = new LinkedList<Exception>();
     private long initTime;
+    private int headerBufferSize = 8192; // SiteMinder uses lots of HEAD space
+    private static final int DEFAULT_SSL_PORT = 443;
     List<HandlerBuilder> handlers = new ArrayList<HandlerBuilder>();
 
     /**
@@ -230,7 +231,17 @@ public class EmbeddedJettyBuilder {
         queuedThreadPool.setDaemon(daemon);
         queuedThreadPool.setName("embedded-jetty");
         Server server = new Server(queuedThreadPool);
-        ServerConnector connector = new ServerConnector(server);
+
+        HttpConfiguration http_config = new HttpConfiguration();
+        if (ServerUtil.readConfigurationParameter("ssl.on", "false").equals("true")){
+            int sslListenPort = ServerUtil.readConfigurationParameter("ssl.port", DEFAULT_SSL_PORT);
+            http_config.setSecureScheme("https");
+            http_config.setSecurePort(sslListenPort);
+        }
+        http_config.setRequestHeaderSize(headerBufferSize);
+        http_config.setResponseHeaderSize(headerBufferSize);
+
+        ServerConnector connector = new ServerConnector(server, new HttpConnectionFactory(http_config));
         connector.setPort(port);
 
         if (devMode) {
@@ -455,6 +466,10 @@ public class EmbeddedJettyBuilder {
         server.addLifeCycleListener(listener);
     }
 
+
+    public void setHeaderBufferSize(int headerBufferSize) {
+        this.headerBufferSize = headerBufferSize;
+    }
 }
 
 

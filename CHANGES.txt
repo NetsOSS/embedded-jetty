@@ -1,3 +1,12 @@
+Note: SSL support has not yet been properly ported from shared-server. If you server needs to
+implement ssl you will need to patch this.
+
+
+1.2.2
+===
+Fixed https://jira.bbs.no/jira/browse/EMBEDDEDJETTY-1
+
+
 1.2.1
 ===
 Added nice thread pool name to the embedded-jetty threads
