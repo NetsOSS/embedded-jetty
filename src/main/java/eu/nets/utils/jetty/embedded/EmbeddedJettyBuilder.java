@@ -228,6 +228,7 @@ public class EmbeddedJettyBuilder {
         failIfPortIsTaken(port);
         QueuedThreadPool queuedThreadPool = new QueuedThreadPool();
         queuedThreadPool.setDaemon(daemon);
+        queuedThreadPool.setName("embedded-jetty");
         Server server = new Server(queuedThreadPool);
         ServerConnector connector = new ServerConnector(server);
         connector.setPort(port);

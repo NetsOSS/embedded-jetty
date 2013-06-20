@@ -1,3 +1,6 @@
+1.2.1
+===
+Added nice thread pool name to the embedded-jetty threads
 1.2
 ====
 Setting -Dembedded.jetty.daemon=true will launch embedded jetty with all daemon threads, which may be nice when running from within maven.
