@@ -1,6 +1,14 @@
 Note: SSL support has not yet been properly ported from shared-server. If you server needs to
 implement ssl you will need to patch this.
 
+1.2.4 (TBR)
+===
+- Disabled NIO (file locking on windows) for static resources in devmode. Requires jetty 9.0.4 for this to work,
+ignored otherwise.
+
+1.2.3
+===
+- Added method that accepts filterHolder
 
 1.2.2
 ===
