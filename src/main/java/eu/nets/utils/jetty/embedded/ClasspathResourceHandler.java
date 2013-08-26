@@ -3,6 +3,8 @@ package eu.nets.utils.jetty.embedded;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.util.resource.Resource;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 
 /**
@@ -22,6 +24,31 @@ public class ClasspathResourceHandler extends ResourceHandler {
         if (resourceFolder.length() < 2)
             throw new IllegalArgumentException("resourceFolder must point to a subdirectory, or you will expose your entire classpath as http resources");
         this.classPathFolder = resourceFolder;
+        if (!useCaches){
+            setMaxContentLength();
+
+        }
+    }
+
+    private void setMaxContentLength()
+    {
+        try
+        {
+            Method setMinMemoryMappedContentLength;
+            setMinMemoryMappedContentLength = this.getClass().getMethod( "setMinMemoryMappedContentLength" );
+            if (setMinMemoryMappedContentLength != null){
+                setMinMemoryMappedContentLength.invoke( this, Integer.MAX_VALUE );
+            }
+        }
+        catch ( NoSuchMethodException ignore )
+        {
+        }
+        catch ( InvocationTargetException ignored )
+        {
+        }
+        catch ( IllegalAccessException ignored )
+        {
+        }
     }
 
     @Override

@@ -56,7 +56,7 @@ public class EmbeddedJettyBuilder {
     List<HandlerBuilder> handlers = new ArrayList<HandlerBuilder>();
 
     /**
-     * Create a new builder.
+     *Create a new builder.
      *
      * @param context The context defining the root path and port of the application
      * @param devMode true to run in development mode, which normally caches less content.
@@ -120,6 +120,10 @@ public class EmbeddedJettyBuilder {
             return this;
         }
 
+        public ServletContextHandlerBuilder addFilterHolder(FilterHolder filterHolder, String pathSpec, EnumSet<DispatcherType> dispatches) {
+            handler.addFilter(filterHolder, pathSpec, dispatches);
+            return this;
+        }
 
         public ServletContextHandlerBuilder setSecurityHandler(SecurityHandler securityHandler) {
             handler.setSecurityHandler(securityHandler);
@@ -438,7 +442,8 @@ public class EmbeddedJettyBuilder {
      */
     public ClasspathResourceHandler createNetsStandardClasspathResourceHandler() {
         boolean useCaches = !devMode;
-        return new ClasspathResourceHandler("/webapp", useCaches);
+        ClasspathResourceHandler classpathResourceHandler = new ClasspathResourceHandler("/webapp", useCaches);
+        return classpathResourceHandler;
     }
 
     /**
