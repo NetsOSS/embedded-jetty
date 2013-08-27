@@ -4,13 +4,24 @@ import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.HandlerList;
+import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.junit.Test;
 
+import javax.servlet.DispatcherType;
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import java.io.IOException;
 import java.net.BindException;
 import java.net.ServerSocket;
+import java.util.EnumSet;
 
 import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertTrue;
 import static junit.framework.TestCase.fail;
 
 /**
@@ -36,10 +47,42 @@ public class EmbeddedJettyBuilderTest {
     public void testCreateRootServletContextHandler() throws Exception {
         EmbeddedJettyBuilder builder = getBuilder();
         String path = "/deb";
-        builder.createRootServletContextHandler(path);
+        builder.createRootServletContextHandler( path );
         assertEquals(1, builder.handlers.size());
         ServletContextHandler handler = getFirstHandler(builder.buildJetty());
         assertEquals(contextPath + path, handler.getContextPath());
+    }
+
+    @Test
+    public void testAddFilter() throws Exception {
+        EmbeddedJettyBuilder builder = getBuilder();
+        String path = "/deb";
+        EmbeddedJettyBuilder.ServletContextHandlerBuilder hdl = builder.createRootServletContextHandler( path );
+        TestFilter filter = new TestFilter();
+        hdl.addFilter( filter, "/foo", EnumSet.of( DispatcherType.REQUEST ) );
+        ServletContextHandler handler = getFirstHandler( builder.buildJetty() );
+        FilterHolder filterHolder = handler.getServletHandler().getFilters()[0];
+        assertTrue(  filter == filterHolder.getFilter());
+    }
+
+    @Test
+    public void testAddFilterHolder() throws Exception {
+        EmbeddedJettyBuilder builder = getBuilder();
+        String path = "/deb";
+        EmbeddedJettyBuilder.ServletContextHandlerBuilder hdl = builder.createRootServletContextHandler( path );
+        TestFilter filter = new TestFilter();
+        FilterHolder fh = new FilterHolder( filter  );
+        hdl.addFilterHolder( fh, "/foo", EnumSet.of( DispatcherType.REQUEST ) );
+        ServletContextHandler handler = getFirstHandler( builder.buildJetty() );
+        FilterHolder filterHolder = handler.getServletHandler().getFilters()[0];
+        assertTrue(  fh == filterHolder);
+        assertTrue(  filter == filterHolder.getFilter());
+    }
+
+    private EmbeddedJettyBuilder.ServletContextHandlerBuilder createStdContext( EmbeddedJettyBuilder builder )
+    {
+        String path = "/deb";
+        return builder.createRootServletContextHandler( path );
     }
 
     @Test
@@ -114,5 +157,22 @@ public class EmbeddedJettyBuilderTest {
     private <T extends Handler> T getFirstHandler(Server server) {
         //noinspection unchecked
         return (T) getHandlerList(server).getHandlers()[0];
+    }
+
+    class TestFilter implements Filter
+    {
+        public void init( FilterConfig filterConfig )
+            throws ServletException
+        {
+        }
+
+        public void doFilter( ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain )
+            throws IOException, ServletException
+        {
+        }
+
+        public void destroy()
+        {
+        }
     }
 }
