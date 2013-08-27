@@ -35,7 +35,7 @@ public class ClasspathResourceHandler extends ResourceHandler {
         try
         {
             Method setMinMemoryMappedContentLength;
-            setMinMemoryMappedContentLength = this.getClass().getMethod( "setMinMemoryMappedContentLength" );
+            setMinMemoryMappedContentLength = ResourceHandler.class.getMethod( "setMinMemoryMappedContentLength", int.class );
             if (setMinMemoryMappedContentLength != null){
                 setMinMemoryMappedContentLength.invoke( this, Integer.MAX_VALUE );
             }
