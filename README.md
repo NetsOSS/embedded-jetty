@@ -8,10 +8,16 @@ How to use
 --------
 See the embedded-jetty-sample project
 
+
 Versioning
 --------
 The 8.0.X version range of embedded jetty matches jetty 8.0.X
 The 9.0.X version range of embedded jetty matches jetty 9.0.X
 
 Current latest versions are 8.0.23 and 9.0.25
+
+Patch strategy
+-----------
+Patches are generally created on the oldest applicable jetty version and merged or cherry picked to
+the future versions.
 
