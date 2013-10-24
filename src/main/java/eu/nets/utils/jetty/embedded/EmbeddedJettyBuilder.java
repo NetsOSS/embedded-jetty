@@ -157,6 +157,11 @@ public class EmbeddedJettyBuilder {
 
         }
 
+        public ServletHolderBuilder setServletName(String name){
+            sh.setName( name );
+            return this;
+        }
+
         public ServletHolderBuilder setInitParameter(String param, String value) {
             sh.setInitParameter(param, value);
             return this;
