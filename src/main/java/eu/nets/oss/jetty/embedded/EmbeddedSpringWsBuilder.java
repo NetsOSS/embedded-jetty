@@ -1,4 +1,4 @@
-package eu.nets.utils.jetty.embedded;
+package eu.nets.oss.jetty.embedded;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;

@@ -1,4 +1,4 @@
-package eu.nets.utils.jetty.embedded.sharedserver.util;
+package eu.nets.oss.jetty.embedded;
 
 import java.io.*;
 import java.util.Properties;

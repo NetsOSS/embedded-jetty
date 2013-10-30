@@ -1,6 +1,5 @@
-package eu.nets.utils.jetty.embedded;
+package eu.nets.oss.jetty.embedded;
 
-import eu.nets.utils.jetty.embedded.sharedserver.util.ServerUtil;
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.SecurityHandler;
 import org.eclipse.jetty.server.*;

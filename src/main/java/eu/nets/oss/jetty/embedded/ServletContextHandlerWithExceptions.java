@@ -1,4 +1,4 @@
-package eu.nets.utils.jetty.embedded;
+package eu.nets.oss.jetty.embedded;
 
 import org.eclipse.jetty.servlet.ServletContextHandler;
 

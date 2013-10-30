@@ -1,4 +1,4 @@
-package eu.nets.utils.jetty.embedded;
+package eu.nets.oss.jetty.embedded;
 
 import org.junit.Test;
 import org.springframework.context.annotation.Bean;
@@ -12,8 +12,8 @@ import org.springframework.ws.transport.http.MessageDispatcherServlet;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 
-import static eu.nets.utils.jetty.embedded.EmbeddedSpringBuilder.*;
-import static eu.nets.utils.jetty.embedded.EmbeddedSpringWsBuilder.createMessageDispatcherServlet;
+import static eu.nets.oss.jetty.embedded.EmbeddedSpringBuilder.*;
+import static eu.nets.oss.jetty.embedded.EmbeddedSpringWsBuilder.createMessageDispatcherServlet;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 

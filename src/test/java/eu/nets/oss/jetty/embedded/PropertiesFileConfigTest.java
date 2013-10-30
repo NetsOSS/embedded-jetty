@@ -1,6 +1,8 @@
-package eu.nets.utils.jetty.embedded;
+package eu.nets.oss.jetty.embedded;
 
 import org.junit.Test;
+
+import eu.nets.oss.jetty.embedded.PropertiesFileConfig;
 
 import static org.junit.Assert.assertEquals;
 

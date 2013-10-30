@@ -1,4 +1,4 @@
-package eu.nets.utils.jetty.embedded;
+package eu.nets.oss.jetty.embedded;
 
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
@@ -7,6 +7,10 @@ import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.junit.Test;
+
+import eu.nets.oss.jetty.embedded.ContextPathConfig;
+import eu.nets.oss.jetty.embedded.EmbeddedJettyBuilder;
+import eu.nets.oss.jetty.embedded.StaticConfig;
 
 import javax.servlet.DispatcherType;
 import javax.servlet.Filter;
