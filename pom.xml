@@ -4,7 +4,7 @@
     <parent>
         <groupId>eu.nets.oss.maven</groupId>
         <artifactId>nets-oss-parent</artifactId>
-        <version>2-SNAPSHOT</version>
+        <version>1</version>
     </parent>
 
     <groupId>eu.nets.oss.jetty</groupId>
