@@ -1,4 +1,4 @@
-package eu.nets.oss.jetty.embedded;
+package eu.nets.oss.jetty;
 
 import org.apache.wicket.RuntimeConfigurationType;
 import org.apache.wicket.protocol.http.ContextParamWebApplicationFactory;

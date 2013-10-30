@@ -1,4 +1,4 @@
-package eu.nets.oss.jetty.embedded;
+package eu.nets.oss.jetty;
 
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.SecurityHandler;
@@ -442,9 +442,9 @@ public class EmbeddedJettyBuilder {
     }
 
     /**
-     * Creates a nets standard resource handler, that can be attached using setResourceHandler
+     * Creates a standard resource handler, that can be attached using setResourceHandler
      */
-    public ClasspathResourceHandler createNetsStandardClasspathResourceHandler() {
+    public ClasspathResourceHandler createWebAppClasspathResourceHandler() {
         boolean useCaches = !devMode;
         ClasspathResourceHandler classpathResourceHandler = new ClasspathResourceHandler("/webapp", useCaches);
         return classpathResourceHandler;

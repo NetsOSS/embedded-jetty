@@ -1,4 +1,4 @@
-package eu.nets.oss.jetty.embedded;
+package eu.nets.oss.jetty;
 
 import java.io.*;
 import java.util.Properties;

@@ -1,4 +1,4 @@
-package eu.nets.oss.jetty.embedded;
+package eu.nets.oss.jetty;
 
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
@@ -8,9 +8,9 @@ import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.junit.Test;
 
-import eu.nets.oss.jetty.embedded.ContextPathConfig;
-import eu.nets.oss.jetty.embedded.EmbeddedJettyBuilder;
-import eu.nets.oss.jetty.embedded.StaticConfig;
+import eu.nets.oss.jetty.ContextPathConfig;
+import eu.nets.oss.jetty.EmbeddedJettyBuilder;
+import eu.nets.oss.jetty.StaticConfig;
 
 import javax.servlet.DispatcherType;
 import javax.servlet.Filter;
@@ -137,9 +137,9 @@ public class EmbeddedJettyBuilderTest {
     }
 
     @Test
-    public void testCreateStandardClasspathResourceHandler() throws Exception {
-        // todo: Make test
-    }
+	    public void testCreateWebAppClasspathResourceHandler() throws Exception {
+	        // todo: Make test
+	    }
 
     @Test
     public void testIsStartedWithAppassembler() throws Exception {

@@ -1,4 +1,4 @@
-package eu.nets.oss.jetty.embedded;
+package eu.nets.oss.jetty;
 
 import org.springframework.beans.BeansException;
 import org.springframework.web.context.ContextLoaderListener;
