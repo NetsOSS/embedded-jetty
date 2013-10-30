@@ -76,23 +76,6 @@ public class EmbeddedJettyBuilder {
         server = createServer(port, devMode, Boolean.getBoolean("embedded.jetty.daemon"));
     }
 
-    public static class HandlerBuilder<T extends Handler> {
-        private final T handler;
-
-        public HandlerBuilder(T handler) {
-            this.handler = handler;
-        }
-
-        public T getHandler() {
-            return handler;
-        }
-
-        public HandlerBuilder<T> setResourceHandler(ResourceHandler resourceHandler) {
-            ((ContextHandler) handler).setHandler(resourceHandler);
-            return this;
-        }
-    }
-
     public class ServletContextHandlerBuilder extends HandlerBuilder<ServletContextHandler> {
         private final ServletContextHandler handler;
 

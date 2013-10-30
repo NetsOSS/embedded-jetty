@@ -21,35 +21,27 @@ public class ClasspathResourceHandler extends ResourceHandler {
         this.cacheContent = useCaches;
         if (resourceFolder == null) throw new IllegalArgumentException("resourceFolder cannot be null");
         if (!resourceFolder.startsWith("/")) throw new IllegalArgumentException("resourceFolder must start with /");
-        if (resourceFolder.length() < 2)
+        if (resourceFolder.length() < 2) {
             throw new IllegalArgumentException("resourceFolder must point to a subdirectory, or you will expose your entire classpath as http resources");
+        }
         this.classPathFolder = resourceFolder;
         if (!useCaches){
             setMaxContentLength();
-
         }
     }
 
-    private void setMaxContentLength()
-    {
-        try
-        {
-            Method setMinMemoryMappedContentLength;
-            setMinMemoryMappedContentLength = ResourceHandler.class.getMethod( "setMinMemoryMappedContentLength", int.class );
-            if (setMinMemoryMappedContentLength != null){
-                setMinMemoryMappedContentLength.invoke( this, Integer.MAX_VALUE );
-            }
-        }
-        catch ( NoSuchMethodException ignore )
-        {
-        }
-        catch ( InvocationTargetException ignored )
-        {
-        }
-        catch ( IllegalAccessException ignored )
-        {
-        }
-    }
+	private void setMaxContentLength() {
+		try {
+			Method setMinMemoryMappedContentLength;
+			setMinMemoryMappedContentLength = ResourceHandler.class.getMethod("setMinMemoryMappedContentLength", int.class);
+			if (setMinMemoryMappedContentLength != null) {
+				setMinMemoryMappedContentLength.invoke(this, Integer.MAX_VALUE);
+			}
+		} catch (NoSuchMethodException ignore) {
+		} catch (InvocationTargetException ignored) {
+		} catch (IllegalAccessException ignored) {
+		}
+	}
 
     @Override
     public Resource getResource(String path) throws MalformedURLException {
