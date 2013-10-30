@@ -1,25 +1,16 @@
 package eu.nets.oss.jetty;
 
-import org.eclipse.jetty.security.ConstraintMapping;
-import org.eclipse.jetty.security.SecurityHandler;
-import org.eclipse.jetty.server.*;
-import org.eclipse.jetty.server.handler.*;
-import org.eclipse.jetty.servlet.FilterHolder;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlet.ServletHolder;
-import org.eclipse.jetty.util.component.LifeCycle;
-import org.eclipse.jetty.util.log.JavaUtilLog;
-import org.eclipse.jetty.util.resource.Resource;
-import org.eclipse.jetty.util.security.Constraint;
-import org.eclipse.jetty.util.thread.QueuedThreadPool;
+import static com.google.common.base.Throwables.propagate;
+import static java.awt.Desktop.getDesktop;
+import static java.lang.String.format;
+import static java.net.InetAddress.getLocalHost;
 
-import javax.servlet.DispatcherType;
-import javax.servlet.Filter;
-import javax.servlet.Servlet;
 import java.io.IOException;
-import java.net.*;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.URI;
+import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -28,10 +19,29 @@ import java.util.EventListener;
 import java.util.LinkedList;
 import java.util.List;
 
-import static com.google.common.base.Throwables.propagate;
-import static java.awt.Desktop.getDesktop;
-import static java.lang.String.format;
-import static java.net.InetAddress.getLocalHost;
+import javax.servlet.DispatcherType;
+import javax.servlet.Filter;
+import javax.servlet.Servlet;
+
+import org.eclipse.jetty.security.ConstraintMapping;
+import org.eclipse.jetty.security.SecurityHandler;
+import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.HttpConfiguration;
+import org.eclipse.jetty.server.HttpConnectionFactory;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.handler.ContextHandler;
+import org.eclipse.jetty.server.handler.HandlerList;
+import org.eclipse.jetty.server.handler.IPAccessHandler;
+import org.eclipse.jetty.server.handler.RequestLogHandler;
+import org.eclipse.jetty.server.handler.ResourceHandler;
+import org.eclipse.jetty.servlet.FilterHolder;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.util.component.LifeCycle;
+import org.eclipse.jetty.util.log.JavaUtilLog;
+import org.eclipse.jetty.util.security.Constraint;
+import org.eclipse.jetty.util.thread.QueuedThreadPool;
 
 
 /**
@@ -51,7 +61,6 @@ public class EmbeddedJettyBuilder {
     private final LinkedList<Exception> startupExceptions = new LinkedList<Exception>();
     private long initTime;
     private int headerBufferSize = 8192; // SiteMinder uses lots of HEAD space
-    private static final int DEFAULT_SSL_PORT = 443;
     List<HandlerBuilder> handlers = new ArrayList<HandlerBuilder>();
 
     /**
@@ -241,11 +250,6 @@ public class EmbeddedJettyBuilder {
         Server server = new Server(queuedThreadPool);
 
         HttpConfiguration http_config = new HttpConfiguration();
-        if (ServerUtil.readConfigurationParameter("ssl.on", "false").equals("true")){
-            int sslListenPort = ServerUtil.readConfigurationParameter("ssl.port", DEFAULT_SSL_PORT);
-            http_config.setSecureScheme("https");
-            http_config.setSecurePort(sslListenPort);
-        }
         http_config.setRequestHeaderSize(headerBufferSize);
         http_config.setResponseHeaderSize(headerBufferSize);
 
@@ -264,42 +268,6 @@ public class EmbeddedJettyBuilder {
         //connector.setSoLingerTime(-1);
         server.addConnector(connector);
         return server;
-    }
-
-    /**
-     * check if a keystore for a SSL certificate is available, and
-     * if so, start a SSL connector on port 8443. By default, the
-     * quickstart comes with a Apache Wicket Quickstart Certificate
-     * that expires about half way september 2021. Do not use this
-     * certificate anywhere important as the passwords are available
-     * in the source.
-     *
-     * @param timeout a timeout ;)
-     */
-    public void addKeystore(int timeout) {
-        Resource keystore = Resource.newClassPathResource("/keystore");
-        if (keystore != null && keystore.exists()) {
-            //connector.setConfidentialPort(8443);
-            org.eclipse.jetty.util.ssl.SslContextFactory factory = new org.eclipse.jetty.util.ssl.SslContextFactory();
-            factory.setKeyStoreResource(keystore);
-            factory.setKeyStorePassword("wicket");
-            try {
-                KeyStore ks = KeyStore.getInstance("/keyStore");
-                factory.setTrustStore(ks);
-            } catch (KeyStoreException e) {
-                throw new RuntimeException(e);
-            }
-            factory.setKeyManagerPassword("wicket");
-            ServerConnector sslConnector = new ServerConnector(server, factory);
-            sslConnector.setIdleTimeout(timeout);
-            sslConnector.setPort(8443);
-            sslConnector.setAcceptQueueSize(4);
-            server.addConnector(sslConnector);
-
-            System.out.println("SSL access to the quickstart has been enabled on port 8443");
-            System.out.println("You can access the application using SSL on https://localhost:8443");
-            System.out.println();
-        }
     }
 
     Server buildJetty() {
