@@ -5,7 +5,7 @@ Provides a simple way of building embedded Jetty instances that allows for web.x
 
 How to use
 ----------
-See the embedded-jetty-sample project
+See https://github.com/NetsOSS/embedded-jetty-sample
 
 Versioning
 ----------
