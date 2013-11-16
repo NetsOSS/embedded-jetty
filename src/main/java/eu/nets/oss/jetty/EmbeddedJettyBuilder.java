@@ -1,40 +1,9 @@
 package eu.nets.oss.jetty;
 
-import static com.google.common.base.Throwables.propagate;
-import static java.awt.Desktop.getDesktop;
-import static java.lang.String.format;
-import static java.net.InetAddress.getLocalHost;
-
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.URI;
-import java.net.UnknownHostException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.EnumSet;
-import java.util.EventListener;
-import java.util.LinkedList;
-import java.util.List;
-
-import javax.servlet.DispatcherType;
-import javax.servlet.Filter;
-import javax.servlet.Servlet;
-
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.SecurityHandler;
-import org.eclipse.jetty.server.Handler;
-import org.eclipse.jetty.server.HttpConfiguration;
-import org.eclipse.jetty.server.HttpConnectionFactory;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.ServerConnector;
-import org.eclipse.jetty.server.handler.ContextHandler;
-import org.eclipse.jetty.server.handler.HandlerList;
-import org.eclipse.jetty.server.handler.IPAccessHandler;
-import org.eclipse.jetty.server.handler.RequestLogHandler;
-import org.eclipse.jetty.server.handler.ResourceHandler;
+import org.eclipse.jetty.server.*;
+import org.eclipse.jetty.server.handler.*;
 import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
@@ -42,6 +11,18 @@ import org.eclipse.jetty.util.component.LifeCycle;
 import org.eclipse.jetty.util.log.JavaUtilLog;
 import org.eclipse.jetty.util.security.Constraint;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
+
+import javax.servlet.DispatcherType;
+import javax.servlet.Filter;
+import javax.servlet.Servlet;
+import java.io.IOException;
+import java.net.*;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
+import static java.awt.Desktop.getDesktop;
+import static java.lang.String.format;
+import static java.net.InetAddress.getLocalHost;
 
 
 /**
@@ -289,7 +270,7 @@ public class EmbeddedJettyBuilder {
             verifyServerStartup();
         } catch (Exception e) {
             //noinspection ThrowableResultOfMethodCallIgnored
-            propagate(e);
+            throw new RuntimeException(e);
         }
     }
 
