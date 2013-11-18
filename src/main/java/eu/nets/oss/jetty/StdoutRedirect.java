@@ -3,11 +3,9 @@ package eu.nets.oss.jetty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.OutputStream;
 import java.io.PrintStream;
-
-import static com.google.common.base.CharMatcher.anyOf;
-import static com.google.common.base.Splitter.on;
+import java.util.Arrays;
+import java.util.List;
 
 
 /**
@@ -33,7 +31,7 @@ public class StdoutRedirect {
 
 
             public void print(final String string) {
-                Iterable<String> lines = on(anyOf("\r\n")).split(string);
+                List<String> lines = Arrays.asList(string.split("[\r\n]+"));
                 for (String line : lines) {
                     if (stdout)
                         logger.info(line);

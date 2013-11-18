@@ -1,9 +1,10 @@
 package eu.nets.oss.jetty;
 
-import com.google.common.base.Splitter;
 
 import java.io.*;
 import java.nio.charset.Charset;
+import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * Todo: Think about this design. It is inherently not a very good design, since it
@@ -64,6 +65,10 @@ public class PropertiesFileConfig implements ContextPathConfig {
     }
 
     public Iterable<String> getIpWhiteList() {
-        return Splitter.on(",").split(System.getProperty("ipWhiteList", ""));
+        String ipWhiteList = System.getProperty("ipWhiteList", "");
+        if (ipWhiteList.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return Arrays.asList(ipWhiteList.split(","));
     }
 }
