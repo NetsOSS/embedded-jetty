@@ -15,9 +15,9 @@
     <description>Code for starting embedded Jetty.</description>
 
     <scm>
-        <connection>scm:git:git@vm-psource-4:embedded-jetty/embedded-jetty.git</connection>
-        <developerConnection>scm:git:git@vm-psource-4:embedded-jetty/embedded-jetty.git</developerConnection>
-        <url>https://vm-psource-4/embedded-jetty/embedded-jetty</url>
+        <connection>scm:git:https://github.com/NetsOSS/embedded-jetty</connection>
+        <developerConnection>scm:git:https://github.com/NetsOSS/embedded-jetty</developerConnection>
+        <url>https://github.com/NetsOSS/embedded-jetty</url>
     </scm>
 
     <properties>
