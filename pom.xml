@@ -10,7 +10,7 @@
     <groupId>eu.nets.oss.jetty</groupId>
     <artifactId>embedded-jetty</artifactId>
     <packaging>jar</packaging>
-    <version>1.0+9.1</version>
+    <version>1.1+9.1-SNAPSHOT</version>
     <name>embedded-jetty</name>
     <description>Code for starting embedded Jetty.</description>
 
@@ -18,7 +18,7 @@
         <connection>scm:git:https://github.com/NetsOSS/embedded-jetty</connection>
         <developerConnection>scm:git:https://github.com/NetsOSS/embedded-jetty</developerConnection>
         <url>https://github.com/NetsOSS/embedded-jetty</url>
-      <tag>embedded-jetty-1.0+9.1</tag>
+      <tag>HEAD</tag>
   </scm>
 
     <properties>
