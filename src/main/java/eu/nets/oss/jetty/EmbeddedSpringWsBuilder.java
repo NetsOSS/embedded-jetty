@@ -1,6 +1,5 @@
 package eu.nets.oss.jetty;
 
-import org.apache.commons.lang.StringUtils;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.ws.transport.http.MessageDispatcherServlet;
 
@@ -26,10 +25,19 @@ public class EmbeddedSpringWsBuilder {
         }
         MessageDispatcherServlet messageDispatcherServlet = new MessageDispatcherServlet();
         messageDispatcherServlet.setContextClass(AnnotationConfigWebApplicationContext.class);
-        messageDispatcherServlet.setContextConfigLocation(StringUtils.removeEnd(items.toString(), "," ));
+        messageDispatcherServlet.setContextConfigLocation(removeEnd(items.toString(), "," ));
         messageDispatcherServlet.setTransformWsdlLocations(true);
         return messageDispatcherServlet;
     }
 
+    public static String removeEnd(String str, String remove) {
+        if (str == null || str.isEmpty() || remove == null || remove.isEmpty()) {
+            return str;
+        }
+        if (str.endsWith(remove)) {
+            return str.substring(0, str.length() - remove.length());
+        }
+        return str;
+    }
 
 }
