@@ -1,4 +1,4 @@
-Embedded-jetty
+Embedded Jetty
 ==============
 
 Provides a simple way of building embedded Jetty instances that allows for web.xml-free startup. The resulting application is identical within your IDE and your actual application deployment environment.
