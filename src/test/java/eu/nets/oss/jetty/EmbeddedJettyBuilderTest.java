@@ -1,7 +1,11 @@
 package eu.nets.oss.jetty;
 
+import org.eclipse.jetty.server.ConnectionFactory;
 import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.HttpConfiguration;
+import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.servlet.FilterHolder;
@@ -19,6 +23,7 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+
 import java.io.IOException;
 import java.net.BindException;
 import java.net.ServerSocket;
@@ -27,6 +32,9 @@ import java.util.EnumSet;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
 import static junit.framework.TestCase.fail;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * @author Kristian Rosenvold
@@ -83,6 +91,18 @@ public class EmbeddedJettyBuilderTest {
         assertTrue(  filter == filterHolder.getFilter());
     }
 
+    @Test
+    public void testHeaderSizeSetCorrectly() throws Exception {
+        ContextPathConfig config = new StaticConfig(contextPath, port);
+        EmbeddedJettyBuilder builder = new EmbeddedJettyBuilder(config, true, 1900);
+        ServerConnector conn = (ServerConnector)builder.getServer().getConnectors()[0];
+        HttpConnectionFactory factory = (HttpConnectionFactory)conn.getConnectionFactories().toArray(new ConnectionFactory[]{})[0];
+        HttpConfiguration httpConfiguration = factory.getHttpConfiguration();
+        
+        assertThat(httpConfiguration.getRequestHeaderSize(), is(equalTo(1900)));
+    }
+    
+    
     private EmbeddedJettyBuilder.ServletContextHandlerBuilder createStdContext( EmbeddedJettyBuilder builder )
     {
         String path = "/deb";
