@@ -51,6 +51,11 @@ public class EmbeddedJettyBuilder {
      * @param devMode true to run in development mode, which normally caches less content.
      */
     public EmbeddedJettyBuilder(ContextPathConfig context, boolean devMode) {
+        this(context, devMode, 8192);
+    }
+    
+    public EmbeddedJettyBuilder(ContextPathConfig context, boolean devMode, int headerBufferSize) {
+        this.headerBufferSize = headerBufferSize;
         this.contextPath = context.getContextPath();
         this.port = context.getPort();
         this.devMode = devMode;
@@ -405,11 +410,6 @@ public class EmbeddedJettyBuilder {
 
     public void addLifecycleListener(LifeCycle.Listener listener){
         server.addLifeCycleListener(listener);
-    }
-
-
-    public void setHeaderBufferSize(int headerBufferSize) {
-        this.headerBufferSize = headerBufferSize;
     }
 }
 
