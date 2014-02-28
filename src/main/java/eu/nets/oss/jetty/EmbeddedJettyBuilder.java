@@ -174,12 +174,44 @@ public class EmbeddedJettyBuilder {
      * @return A handler builder
      */
     public ServletContextHandlerBuilder createRootServletContextHandler(String subPath) {
+        return createRootServletContextHandlerInternal(subPath, null);
+    }
+
+    /**
+     * Example requestLogger:
+     * <pre>
+     * NCSARequestLog requestLog = new NCSARequestLog("logs/my-app-jetty-web-yyyy_mm_dd.request.log");
+     * requestLog.setRetainDays(90);
+     * requestLog.setAppend(true);
+     * requestLog.setExtended(false);
+     * requestLog.setLogTimeZone("Europe/Oslo"); // or GMT
+     </pre>
+     * https://wiki.eclipse.org/Jetty/Howto/Configure_Request_Logs
+     * @param subPath
+     * @param requestLogger
+     * @return
+     */
+    public ServletContextHandlerBuilder createRootServletContextHandler(String subPath, RequestLog requestLogger) {
+        if (requestLogger == null) {
+            throw new RuntimeException("RequestLogger cannot be null");
+        }
+        return createRootServletContextHandlerInternal(subPath, requestLogger);
+    }
+
+    private ServletContextHandlerBuilder createRootServletContextHandlerInternal(String subPath, RequestLog requestLogger) {
         ServletContextHandler handler = getServletContextHandler();
         ServletContextHandlerBuilder e = new ServletContextHandlerBuilder(handler);
         String usePath = contextPath + subPath;
         setPath(e.getHandler(), usePath);
-        handlers.add(e);
+        handlers.add(requestLogger==null ? e : wrapWithRequestLogger(e, requestLogger));
         return e;
+    }
+
+    private HandlerBuilder wrapWithRequestLogger(ServletContextHandlerBuilder e, RequestLog requestLogger) {
+        RequestLogHandler handler = new RequestLogHandler();
+        handler.setHandler(e.handler);
+        handler.setRequestLog(requestLogger);
+        return new HandlerBuilder(handler);
     }
 
     @SuppressWarnings("UnusedDeclaration")
