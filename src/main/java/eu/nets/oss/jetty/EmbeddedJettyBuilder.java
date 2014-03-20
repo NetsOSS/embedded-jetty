@@ -211,6 +211,11 @@ public class EmbeddedJettyBuilder {
         return new HandlerBuilder<>(handler);
     }
 
+    public EmbeddedJettyBuilder exportMBeans() {
+        JettyJmx.exportMBeans(server);
+        return this;
+    }
+
     @SuppressWarnings("UnusedDeclaration")
     public void addWhiteList(Iterable<String> allowedIps) {
         secureWrap = new IPAccessHandler();
