@@ -39,10 +39,10 @@ public class EmbeddedJettyBuilder {
     private final int port;
     private final boolean devMode;
     private IPAccessHandler secureWrap;
-    private final LinkedList<Exception> startupExceptions = new LinkedList<Exception>();
+    private final LinkedList<Exception> startupExceptions = new LinkedList<>();
     private long initTime;
     private int headerBufferSize = 8192; // SiteMinder uses lots of HEAD space
-    List<HandlerBuilder> handlers = new ArrayList<HandlerBuilder>();
+    List<HandlerBuilder> handlers = new ArrayList<>();
 
     /**
      *Create a new builder.
@@ -53,7 +53,7 @@ public class EmbeddedJettyBuilder {
     public EmbeddedJettyBuilder(ContextPathConfig context, boolean devMode) {
         this(context, devMode, 8192);
     }
-    
+
     public EmbeddedJettyBuilder(ContextPathConfig context, boolean devMode, int headerBufferSize) {
         this.headerBufferSize = headerBufferSize;
         this.contextPath = context.getContextPath();
@@ -155,12 +155,12 @@ public class EmbeddedJettyBuilder {
     /**
      * Creates a HandlerBuilder that is mounted on top of the root path of this builder
      *
-     * @param subPath The sub-path that will be appended, starting with a slash, or just an empty string for no subpath
+     * @param subPath The sub-path that will be appended, starting with a slash, or just an empty string for no sub-path
      * @return A handler builder. This can not be used for servlets, see #createRootServletContextHandler
      */
-    public HandlerBuilder createRootContextHandler(String subPath) {
+    public HandlerBuilder<ContextHandler> createRootContextHandler(String subPath) {
         ContextHandler contextHandler = new ContextHandler();
-        HandlerBuilder<ContextHandler> e = new HandlerBuilder<ContextHandler>(contextHandler);
+        HandlerBuilder<ContextHandler> e = new HandlerBuilder<>(contextHandler);
         String usePath = contextPath + subPath;
         setPath(contextHandler, usePath);
         handlers.add(e);
@@ -187,9 +187,6 @@ public class EmbeddedJettyBuilder {
      * requestLog.setLogTimeZone("Europe/Oslo"); // or GMT
      </pre>
      * https://wiki.eclipse.org/Jetty/Howto/Configure_Request_Logs
-     * @param subPath
-     * @param requestLogger
-     * @return
      */
     public ServletContextHandlerBuilder createRootServletContextHandler(String subPath, RequestLog requestLogger) {
         if (requestLogger == null) {
@@ -207,11 +204,11 @@ public class EmbeddedJettyBuilder {
         return e;
     }
 
-    private HandlerBuilder wrapWithRequestLogger(ServletContextHandlerBuilder e, RequestLog requestLogger) {
+    private HandlerBuilder<RequestLogHandler> wrapWithRequestLogger(ServletContextHandlerBuilder e, RequestLog requestLogger) {
         RequestLogHandler handler = new RequestLogHandler();
         handler.setHandler(e.handler);
         handler.setRequestLog(requestLogger);
-        return new HandlerBuilder(handler);
+        return new HandlerBuilder<>(handler);
     }
 
     @SuppressWarnings("UnusedDeclaration")
@@ -334,16 +331,16 @@ public class EmbeddedJettyBuilder {
     @SuppressWarnings("UnusedDeclaration")
     private static void checkIfServerIsRunning(final int port) {
         try {
-            final String hostAddress = failsafeGetHostname();
+            final String hostAddress = failSafeGetHostname();
             new Socket(hostAddress, port).close();
-            throw new IllegalArgumentException(String.format("A runnning server was found on '%s', port '%d'",
+            throw new IllegalArgumentException(String.format("A running server was found on '%s', port '%d'",
                     hostAddress, port));
         } catch (IOException e) {
             //
         }
     }
 
-    private static String failsafeGetHostname() throws UnknownHostException {
+    private static String failSafeGetHostname() throws UnknownHostException {
         try {
             return InetAddress.getLocalHost().getHostAddress();
         } catch (UnknownHostException e) {
@@ -415,12 +412,11 @@ public class EmbeddedJettyBuilder {
      */
     public ClasspathResourceHandler createWebAppClasspathResourceHandler() {
         boolean useCaches = !devMode;
-        ClasspathResourceHandler classpathResourceHandler = new ClasspathResourceHandler("/webapp", useCaches);
-        return classpathResourceHandler;
+        return new ClasspathResourceHandler("/webapp", useCaches);
     }
 
     /**
-     * @return true if the current process has been started with appassambler
+     * @return true if the current process has been started with appassembler.
      */
     public static boolean isStartedWithAppassembler() {
         final String[] appAssemblerProperties = {
