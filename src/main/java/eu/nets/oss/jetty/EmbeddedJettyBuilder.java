@@ -34,7 +34,7 @@ import static java.net.InetAddress.getLocalHost;
  * @author Kristian Rosenvold
  */
 public class EmbeddedJettyBuilder {
-    private final Server server;
+    private Server server;
     private final String contextPath;
     private final int port;
     private final boolean devMode;
@@ -43,6 +43,9 @@ public class EmbeddedJettyBuilder {
     private long initTime;
     private int headerBufferSize = 8192; // SiteMinder uses lots of HEAD space
     List<HandlerBuilder> handlers = new ArrayList<>();
+    private boolean shouldExportMBeans;
+    private QueuedThreadPool queuedThreadPool;
+    private boolean shouldSendVersionNumber;
 
     /**
      *Create a new builder.
@@ -59,10 +62,34 @@ public class EmbeddedJettyBuilder {
         this.contextPath = context.getContextPath();
         this.port = context.getPort();
         this.devMode = devMode;
-        server = createServer(port, devMode, Boolean.getBoolean("embedded.jetty.daemon"));
+    }
+
+    public EmbeddedJettyBuilder exportMBeans() {
+        this.shouldExportMBeans = true;
+        return this;
+    }
+
+    @SuppressWarnings("UnusedDeclaration")
+    public void addWhiteList(Iterable<String> allowedIps) {
+        secureWrap = new IPAccessHandler();
+        for (String allowedIp : allowedIps) {
+            secureWrap.addWhite(allowedIp);
+        }
+    }
+
+    @SuppressWarnings("UnusedDeclaration")
+    public EmbeddedJettyBuilder sendVersionNumber() {
+        this.shouldSendVersionNumber = true;
+        return this;
+    }
+
+    public EmbeddedJettyBuilder withThreadPool(QueuedThreadPool queuedThreadPool) {
+        this.queuedThreadPool = queuedThreadPool;
+        return this;
     }
 
     public class ServletContextHandlerBuilder extends HandlerBuilder<ServletContextHandler> {
+
         private final ServletContextHandler handler;
 
         public ServletContextHandlerBuilder(ServletContextHandler handler) {
@@ -116,7 +143,6 @@ public class EmbeddedJettyBuilder {
             handler.setHandler(resourceHandler);
             return this;
         }
-
     }
 
     public class ServletHolderBuilder {
@@ -133,7 +159,6 @@ public class EmbeddedJettyBuilder {
             return this;
 
         }
-
         public ServletHolderBuilder setServletName(String name){
             sh.setName( name );
             return this;
@@ -142,14 +167,12 @@ public class EmbeddedJettyBuilder {
         public ServletHolderBuilder setInitParameter(String param, String value) {
             sh.setInitParameter(param, value);
             return this;
-
         }
     }
 
     private void setPath(ContextHandler handler, String usePath) {
         Logger.info(this.getClass(), ">>>> Context handler added at " + usePath + " <<<<");
         handler.setContextPath(usePath);
-
     }
 
     /**
@@ -211,19 +234,6 @@ public class EmbeddedJettyBuilder {
         return new HandlerBuilder<>(handler);
     }
 
-    public EmbeddedJettyBuilder exportMBeans() {
-        JettyJmx.exportMBeans(server);
-        return this;
-    }
-
-    @SuppressWarnings("UnusedDeclaration")
-    public void addWhiteList(Iterable<String> allowedIps) {
-        secureWrap = new IPAccessHandler();
-        for (String allowedIp : allowedIps) {
-            secureWrap.addWhite(allowedIp);
-        }
-    }
-
     private ServletContextHandler getServletContextHandler() {
         return new ServletContextHandlerWithExceptions(contextPath, startupExceptions);
     }
@@ -236,8 +246,6 @@ public class EmbeddedJettyBuilder {
         } catch (IOException e) {
             throw new RuntimeException("Port " + port + " is already in use");
         }
-
-
     }
 
     private Server createServer(int port, boolean devMode, boolean daemon) {
@@ -247,12 +255,15 @@ public class EmbeddedJettyBuilder {
         // todo: Determine if we need to support this for production purposes.
 
         failIfPortIsTaken(port);
-        QueuedThreadPool queuedThreadPool = new QueuedThreadPool();
+        if (queuedThreadPool == null) {
+            queuedThreadPool = new QueuedThreadPool();
+        }
         queuedThreadPool.setDaemon(daemon);
         queuedThreadPool.setName("embedded-jetty");
         Server server = new Server(queuedThreadPool);
-
         HttpConfiguration http_config = new HttpConfiguration();
+
+        http_config.setSendServerVersion(shouldSendVersionNumber);
         http_config.setRequestHeaderSize(headerBufferSize);
         http_config.setResponseHeaderSize(headerBufferSize);
 
@@ -266,7 +277,6 @@ public class EmbeddedJettyBuilder {
             server.setStopAtShutdown(true);
             server.setStopTimeout(2000);
         }
-        connector.setIdleTimeout(10000000);
 
         //connector.setSoLingerTime(-1);
         server.addConnector(connector);
@@ -274,6 +284,7 @@ public class EmbeddedJettyBuilder {
     }
 
     Server buildJetty() {
+        this.server = createServer(port, devMode, Boolean.getBoolean("embedded.jetty.daemon"));
         HandlerList hl = new HandlerList();
         for (HandlerBuilder handler : handlers) {
             hl.addHandler(handler.getHandler());
@@ -288,6 +299,9 @@ public class EmbeddedJettyBuilder {
         }
 
         server.setHandler(handlerToUse);
+        if (shouldExportMBeans) {
+            JettyJmx.exportMBeans(server);
+        }
         return server;
     }
 
