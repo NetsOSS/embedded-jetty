@@ -10,6 +10,8 @@ import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.util.thread.QueuedThreadPool;
+import org.eclipse.jetty.util.thread.ThreadPool;
 import org.junit.Test;
 
 import eu.nets.oss.jetty.ContextPathConfig;
@@ -95,14 +97,31 @@ public class EmbeddedJettyBuilderTest {
     public void testHeaderSizeSetCorrectly() throws Exception {
         ContextPathConfig config = new StaticConfig(contextPath, port);
         EmbeddedJettyBuilder builder = new EmbeddedJettyBuilder(config, true, 1900);
-        ServerConnector conn = (ServerConnector)builder.getServer().getConnectors()[0];
+        ServerConnector conn = (ServerConnector)builder.buildJetty().getServer().getConnectors()[0];
         HttpConnectionFactory factory = (HttpConnectionFactory)conn.getConnectionFactories().toArray(new ConnectionFactory[]{})[0];
         HttpConfiguration httpConfiguration = factory.getHttpConfiguration();
         
         assertThat(httpConfiguration.getRequestHeaderSize(), is(equalTo(1900)));
     }
-    
-    
+
+
+    @Test
+    public void thatCustomThreadPoolIsUsed() throws Exception {
+        EmbeddedJettyBuilder builder = getBuilder();
+        builder.withThreadPool(new QueuedThreadPool(20, 5));
+        ThreadPool.SizedThreadPool threadPool = (ThreadPool.SizedThreadPool )builder.buildJetty().getServer().getThreadPool();
+        assertThat(threadPool.getMaxThreads(), is(20));
+        assertThat(threadPool.getMinThreads(), is(5));
+    }
+
+
+    @Test
+    public void thatUsesDefaultThreadPoolWhenNotSet() throws Exception {
+        EmbeddedJettyBuilder builder = getBuilder();
+        ThreadPool.SizedThreadPool threadPool = (ThreadPool.SizedThreadPool )builder.buildJetty().getServer().getThreadPool();
+        assertThat(threadPool.getMaxThreads(), is(200));
+    }
+
     private EmbeddedJettyBuilder.ServletContextHandlerBuilder createStdContext( EmbeddedJettyBuilder builder )
     {
         String path = "/deb";
