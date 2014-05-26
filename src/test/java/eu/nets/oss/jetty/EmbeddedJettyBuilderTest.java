@@ -44,7 +44,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class EmbeddedJettyBuilderTest {
 
     private final String contextPath = "/abc";
-    private final int port = 8099;
+    private final int port = 8098;
 
     @Test
     public void testCreateRootContextHandler() throws Exception {
