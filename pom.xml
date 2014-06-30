@@ -23,11 +23,6 @@
   <description>Code for starting embedded Jetty.</description>
 
 
-    <!--
-    <scm>
-        <connection>scm:git:git@gitorious.bbsas.no:nets-integration-service/genesis-java-services.git</connection>
-    </scm>
-    -->
   <scm>
     <connection>scm:git:https://github.com/NetsOSS/embedded-jetty</connection>
     <developerConnection>scm:git:https://github.com/NetsOSS/embedded-jetty</developerConnection>
