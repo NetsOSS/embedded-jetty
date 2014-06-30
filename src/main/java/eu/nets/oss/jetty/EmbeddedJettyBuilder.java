@@ -9,7 +9,9 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.component.LifeCycle;
 import org.eclipse.jetty.util.log.JavaUtilLog;
+import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.util.security.Constraint;
+import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 
 import javax.servlet.DispatcherType;
@@ -46,6 +48,9 @@ public class EmbeddedJettyBuilder {
     private boolean shouldExportMBeans;
     private QueuedThreadPool queuedThreadPool;
     private boolean shouldSendVersionNumber;
+    private String keystore;
+    private String keystorePassword;
+    private int sslPort;
 
     /**
      *Create a new builder.
@@ -80,6 +85,13 @@ public class EmbeddedJettyBuilder {
     @SuppressWarnings("UnusedDeclaration")
     public EmbeddedJettyBuilder sendVersionNumber() {
         this.shouldSendVersionNumber = true;
+        return this;
+    }
+
+    public EmbeddedJettyBuilder setKeystore(String keystore, String keystorePassword, int sslPort) {
+        this.keystore = keystore;
+        this.keystorePassword = keystorePassword;
+        this.sslPort = sslPort;
         return this;
     }
 
@@ -278,8 +290,33 @@ public class EmbeddedJettyBuilder {
             server.setStopTimeout(2000);
         }
 
-        //connector.setSoLingerTime(-1);
         server.addConnector(connector);
+
+
+        if (keystore != null) {
+            HttpConfiguration https_config = new HttpConfiguration();
+            https_config.setSecureScheme("https");
+            https_config.setSecurePort(sslPort);
+            https_config.addCustomizer(new SecureRequestCustomizer());
+
+            SslContextFactory sslContextFactory = new SslContextFactory();
+
+            sslContextFactory.setKeyStoreResource(Resource.newClassPathResource(keystore));
+            sslContextFactory.setKeyStorePassword(keystorePassword);
+
+            ServerConnector sslConnector = new ServerConnector(server, new SslConnectionFactory(sslContextFactory, "http/1.1"), new HttpConnectionFactory(https_config));
+            sslConnector.setPort(sslPort);
+
+            if (devMode) {
+                sslConnector.setIdleTimeout(1000000);
+            } else {
+                sslConnector.setIdleTimeout(500000);
+            }
+
+            server.addConnector(sslConnector);
+        }
+
+
         return server;
     }
 
