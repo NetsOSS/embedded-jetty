@@ -17,3 +17,26 @@ Patch strategy
 Patches are generally created on the oldest applicable jetty version and merged or cherry picked to
 the future versions.
 
+JSP
+---
+
+To enable JSP support add these dependencies to your project:
+
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>apache-jsp</artifactId>
+      <version>${jetty.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>apache-jstl</artifactId>
+      <version>${jetty.version}</version>
+    </dependency>
+
+The `jetty-annotations` jar is also required:
+
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-annotations</artifactId>
+      <version>${jetty.version}</version>
+    </dependency>

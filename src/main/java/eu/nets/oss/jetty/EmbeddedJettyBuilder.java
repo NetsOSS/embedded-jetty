@@ -6,11 +6,14 @@ import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.server.handler.*;
 import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.component.LifeCycle;
-import org.eclipse.jetty.util.log.JavaUtilLog;
+import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.util.security.Constraint;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
+import org.eclipse.jetty.webapp.Configuration;
+import org.eclipse.jetty.webapp.WebAppContext;
 
 import javax.servlet.DispatcherType;
 import javax.servlet.Filter;
@@ -48,7 +51,7 @@ public class EmbeddedJettyBuilder {
     private boolean shouldSendVersionNumber;
 
     /**
-     *Create a new builder.
+     * Create a new builder.
      *
      * @param context The context defining the root path and port of the application
      * @param devMode true to run in development mode, which normally caches less content.
@@ -88,21 +91,21 @@ public class EmbeddedJettyBuilder {
         return this;
     }
 
-    public class ServletContextHandlerBuilder extends HandlerBuilder<ServletContextHandler> {
+    public static class ServletContextHandlerBuilder<H extends ServletContextHandler> extends HandlerBuilder<H> {
 
         private final ServletContextHandler handler;
 
-        public ServletContextHandlerBuilder(ServletContextHandler handler) {
+        public ServletContextHandlerBuilder(H handler) {
             super(handler);
             this.handler = handler;
             setHttpCookieOnly(true);
         }
 
         public ServletHolderBuilder addServlet(Servlet servlet) {
-            return new ServletHolderBuilder(this, servlet);
+            return new ServletHolderBuilder<>(this, servlet);
         }
 
-        public ServletContextHandlerBuilder setHttpCookieOnly(boolean httpCookieOnly) {
+        public ServletContextHandlerBuilder<H> setHttpCookieOnly(boolean httpCookieOnly) {
             handler.getSessionHandler().getSessionManager().getSessionCookieConfig().setHttpOnly(httpCookieOnly);
             return this;
         }
@@ -113,43 +116,50 @@ public class EmbeddedJettyBuilder {
          * @param eventListener The event listener to add
          * @return this builder
          */
-        public ServletContextHandlerBuilder addEventListener(EventListener eventListener) {
+        public ServletContextHandlerBuilder<H> addEventListener(EventListener eventListener) {
             handler.addEventListener(eventListener);
             return this;
         }
 
-        public ServletContextHandlerBuilder addFilter(Filter filter, String pathSpec, EnumSet<DispatcherType> dispatches) {
+        public ServletContextHandlerBuilder<H> addFilter(Filter filter, String pathSpec, EnumSet<DispatcherType> dispatches) {
             FilterHolder fh = new FilterHolder(filter);
             handler.addFilter(fh, pathSpec, dispatches);
             return this;
         }
 
-        public ServletContextHandlerBuilder addFilterHolder(FilterHolder filterHolder, String pathSpec, EnumSet<DispatcherType> dispatches) {
+        public ServletContextHandlerBuilder<H> addFilterHolder(FilterHolder filterHolder, String pathSpec, EnumSet<DispatcherType> dispatches) {
             handler.addFilter(filterHolder, pathSpec, dispatches);
             return this;
         }
 
-        public ServletContextHandlerBuilder setSecurityHandler(SecurityHandler securityHandler) {
+        public ServletContextHandlerBuilder<H> setSecurityHandler(SecurityHandler securityHandler) {
             handler.setSecurityHandler(securityHandler);
             return this;
         }
 
-        public ServletContextHandlerBuilder setClassLoader(ClassLoader classLoader) {
+        public ServletContextHandlerBuilder<H> setClassLoader(ClassLoader classLoader) {
             handler.setClassLoader(classLoader);
             return this;
         }
 
-        public ServletContextHandlerBuilder setResourceHandler(ResourceHandler resourceHandler) {
+        public ServletContextHandlerBuilder<H> setResourceHandler(ResourceHandler resourceHandler) {
             handler.setHandler(resourceHandler);
             return this;
         }
     }
 
-    public class ServletHolderBuilder {
-        private final ServletHolder sh;
-        private final EmbeddedJettyBuilder.ServletContextHandlerBuilder servletContext;
+    public static class WebAppContextBuilder extends ServletContextHandlerBuilder<WebAppContext> {
+        public WebAppContextBuilder(WebAppContext handler, Resource baseResource) {
+            super(handler);
+            handler.setBaseResource(baseResource);
+        }
+    }
 
-        public ServletHolderBuilder(ServletContextHandlerBuilder servletContext, Servlet servlet) {
+    public static class ServletHolderBuilder<H extends ServletContextHandler> {
+        private final ServletHolder sh;
+        private final ServletContextHandlerBuilder<H> servletContext;
+
+        public ServletHolderBuilder(ServletContextHandlerBuilder<H> servletContext, Servlet servlet) {
             sh = new ServletHolder(servlet);
             this.servletContext = servletContext;
         }
@@ -159,8 +169,9 @@ public class EmbeddedJettyBuilder {
             return this;
 
         }
-        public ServletHolderBuilder setServletName(String name){
-            sh.setName( name );
+
+        public ServletHolderBuilder setServletName(String name) {
+            sh.setName(name);
             return this;
         }
 
@@ -168,10 +179,13 @@ public class EmbeddedJettyBuilder {
             sh.setInitParameter(param, value);
             return this;
         }
+
+        public ServletContextHandlerBuilder<H> done() {
+            return servletContext;
+        }
     }
 
     private void setPath(ContextHandler handler, String usePath) {
-        Logger.info(this.getClass(), ">>>> Context handler added at " + usePath + " <<<<");
         handler.setContextPath(usePath);
     }
 
@@ -193,11 +207,15 @@ public class EmbeddedJettyBuilder {
     /**
      * Creates a ServletContextHandlerBuilder that is mounted on top of the root path of this builder
      *
-     * @param subPath The sub-path that will be appended, starting with a slash, or just an empty string for no subpath
+     * @param subPath The sub-path that will be appended, starting with a slash, or just an empty string for no sub-path
      * @return A handler builder
      */
-    public ServletContextHandlerBuilder createRootServletContextHandler(String subPath) {
+    public ServletContextHandlerBuilder<ServletContextHandler> createRootServletContextHandler(String subPath) {
         return createRootServletContextHandlerInternal(subPath, null);
+    }
+
+    public ServletContextHandlerBuilder<WebAppContext> createRootWebAppContext(String subPath, Resource baseResource) {
+        return createRootWebAppContext(subPath, baseResource, null);
     }
 
     /**
@@ -208,7 +226,7 @@ public class EmbeddedJettyBuilder {
      * requestLog.setAppend(true);
      * requestLog.setExtended(false);
      * requestLog.setLogTimeZone("Europe/Oslo"); // or GMT
-     </pre>
+     * </pre>
      * https://wiki.eclipse.org/Jetty/Howto/Configure_Request_Logs
      */
     public ServletContextHandlerBuilder createRootServletContextHandler(String subPath, RequestLog requestLogger) {
@@ -218,13 +236,23 @@ public class EmbeddedJettyBuilder {
         return createRootServletContextHandlerInternal(subPath, requestLogger);
     }
 
-    private ServletContextHandlerBuilder createRootServletContextHandlerInternal(String subPath, RequestLog requestLogger) {
+    private ServletContextHandlerBuilder<ServletContextHandler> createRootServletContextHandlerInternal(String subPath, RequestLog requestLogger) {
         ServletContextHandler handler = getServletContextHandler();
-        ServletContextHandlerBuilder e = new ServletContextHandlerBuilder(handler);
+        ServletContextHandlerBuilder<ServletContextHandler> e = new ServletContextHandlerBuilder<>(handler);
         String usePath = contextPath + subPath;
         setPath(e.getHandler(), usePath);
-        handlers.add(requestLogger==null ? e : wrapWithRequestLogger(e, requestLogger));
+        handlers.add(requestLogger == null ? e : wrapWithRequestLogger(e, requestLogger));
         return e;
+    }
+
+    private WebAppContextBuilder createRootWebAppContext(String subPath, Resource baseResource, RequestLog requestLogger) {
+        WebAppContext handler = new WebAppContext();
+        handler.setContextPath(subPath);
+        WebAppContextBuilder builder = new WebAppContextBuilder(handler, baseResource);
+        String usePath = contextPath + subPath;
+        setPath(builder.getHandler(), usePath);
+        handlers.add(requestLogger == null ? builder : wrapWithRequestLogger(builder, requestLogger));
+        return builder;
     }
 
     private HandlerBuilder<RequestLogHandler> wrapWithRequestLogger(ServletContextHandlerBuilder e, RequestLog requestLogger) {
@@ -280,6 +308,32 @@ public class EmbeddedJettyBuilder {
 
         //connector.setSoLingerTime(-1);
         server.addConnector(connector);
+
+        Configuration.ClassList classlist = Configuration.ClassList.setServerDefault(server);
+
+        // Enable annotation processing if the class is available
+
+        boolean hasAnnotationConfiguration = false;
+        try {
+            Class.forName("org.eclipse.jetty.annotations.AnnotationConfiguration");
+            classlist.addBefore("org.eclipse.jetty.webapp.JettyWebXmlConfiguration", "org.eclipse.jetty.annotations.AnnotationConfiguration");
+            hasAnnotationConfiguration = true;
+            Logger.debug(getClass(), "Annotation processing is enabled.");
+        } catch (ClassNotFoundException e) {
+            Logger.debug(getClass(), "Annotation processing is not enabled, missing dependency on jetty-annotations.");
+        }
+
+        try {
+            Class.forName("org.eclipse.jetty.apache.jsp.JettyJasperInitializer");
+            if (!hasAnnotationConfiguration) {
+                Logger.debug(getClass(), "JSP support is not enabled, annotation processing is required.");
+            } else {
+                Logger.debug(getClass(), "JSP support is enabled with Apache Jasper.");
+            }
+        } catch (ClassNotFoundException e) {
+            Logger.debug(getClass(), "JSP support is not enabled, add a dependency on apache-jsp.");
+        }
+
         return server;
     }
 
@@ -363,20 +417,23 @@ public class EmbeddedJettyBuilder {
         try {
             return InetAddress.getLocalHost().getHostAddress();
         } catch (UnknownHostException e) {
-            getLoggerS().info("Unable to retrieve hostname", e);
+            Logger.info(EmbeddedJettyBuilder.class, "Unable to retrieve hostname", e);
             return "localhost";
         }
     }
 
-
     @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
     public void verifyServerStartup() {
-        org.eclipse.jetty.util.log.Logger logger = new JavaUtilLog(EmbeddedJettyBuilder.class.getName());
+        for (Handler handler : server.getHandlers()) {
+            if (!verifyStartup(handler)) {
+                System.exit(-1);
+            }
+        }
 
-
+        // This can probably be removed after verifyStartup() was made, but I'm not sure how to check it.
         if (!startupExceptions.isEmpty()) {
             Exception exception = startupExceptions.peekFirst();
-            logger.warn(format("Errors during startup. The first is %s: %s", exception.getClass().getName(), exception.getMessage()));
+            Logger.warn(getClass(), format("Errors during startup. The first is %s: %s", exception.getClass().getName(), exception.getMessage()));
             System.exit(-1);
         }
 
@@ -386,15 +443,38 @@ public class EmbeddedJettyBuilder {
             ip = InetAddress.getLocalHost().getHostAddress();
         } catch (UnknownHostException ignore) {/* care face */
         }
-        logger.info(format("Server started on http://%s:%d%s in %dms", ip, port, contextPath, startupTime));
+        Logger.info(getClass(), format("Server started on http://%s:%d%s in %dms", ip, port, contextPath, startupTime));
     }
 
-    protected static JavaUtilLog getLoggerS() {
-        return new JavaUtilLog(EmbeddedJettyBuilder.class.getName());
-    }
+    @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
+    private boolean verifyStartup(Handler handler) {
+        if (handler instanceof HandlerContainer) {
+            HandlerContainer list = (HandlerContainer) handler;
+            for (Handler h : list.getHandlers()) {
+                if (!verifyStartup(h)) {
+                    return false;
+                }
+            }
+        }
 
-    protected JavaUtilLog getLogger() {
-        return new JavaUtilLog(this.getClass().getName());
+        if (handler instanceof WebAppContext) {
+            WebAppContext webAppContext = (WebAppContext) handler;
+            Throwable exception = webAppContext.getUnavailableException();
+
+            if (exception != null) {
+                Logger.warn(getClass(), format("Errors during startup. The first is %s: %s. See the log for details.", exception.getClass().getName(), exception.getMessage()));
+                return false;
+            }
+        } else if (handler instanceof ServletHandler) {
+            ServletHandler servletHandler = (ServletHandler) handler;
+
+            if (!servletHandler.isAvailable()) {
+                Logger.warn(getClass(), format("Errors during startup of servlet. See the log for details."));
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public static ConstraintMapping getConstraintMapping(Constraint constraint, String pathSpec) {
@@ -403,7 +483,6 @@ public class EmbeddedJettyBuilder {
         cm2.setPathSpec(pathSpec);
         return cm2;
     }
-
 
     @SuppressWarnings({"ResultOfMethodCallIgnored", "UnusedDeclaration"})
     public void startBrowserStopWithAnyKey(String url) {
@@ -455,7 +534,7 @@ public class EmbeddedJettyBuilder {
         return server;
     }
 
-    public void addLifecycleListener(LifeCycle.Listener listener){
+    public void addLifecycleListener(LifeCycle.Listener listener) {
         server.addLifeCycleListener(listener);
     }
 }

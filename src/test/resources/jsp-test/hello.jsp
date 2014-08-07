@@ -1,0 +1,1 @@
+contextPath=${pageContext.request.requestURL}
