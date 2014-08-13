@@ -121,12 +121,26 @@ public class EmbeddedJettyBuilder {
             return this;
         }
 
-        public ServletContextHandlerBuilder<H> addFilter(Filter filter, String pathSpec, EnumSet<DispatcherType> dispatches) {
+        public FilterBuilder<ServletContextHandlerBuilder<H>> addFilter(Filter filter, String pathSpec, EnumSet<DispatcherType> dispatches) {
             FilterHolder fh = new FilterHolder(filter);
             handler.addFilter(fh, pathSpec, dispatches);
-            return this;
+            return new FilterBuilder<>(fh, this);
         }
 
+        public FilterBuilder<ServletContextHandlerBuilder<H>> addFilter(Class<? extends Filter> filter, String pathSpec, EnumSet<DispatcherType> dispatches) {
+            FilterHolder fh = new FilterHolder(filter);
+            handler.addFilter(fh, pathSpec, dispatches);
+            return new FilterBuilder<>(fh, this);
+        }
+
+        public FilterBuilder<ServletContextHandlerBuilder<H>> addFilter(FilterHolder filterHolder, String pathSpec, EnumSet<DispatcherType> dispatches) {
+            handler.addFilter(filterHolder, pathSpec, dispatches);
+            return new FilterBuilder<>(filterHolder, this);
+        }
+
+        /**
+         * @deprecated Use {@link #addFilter(javax.servlet.Filter, String, java.util.EnumSet)} instead.
+         */
         public ServletContextHandlerBuilder<H> addFilterHolder(FilterHolder filterHolder, String pathSpec, EnumSet<DispatcherType> dispatches) {
             handler.addFilter(filterHolder, pathSpec, dispatches);
             return this;
@@ -167,7 +181,6 @@ public class EmbeddedJettyBuilder {
         public ServletHolderBuilder mountAtPath(String pathSpec) {
             this.servletContext.handler.addServlet(sh, pathSpec);
             return this;
-
         }
 
         public ServletHolderBuilder setServletName(String name) {
@@ -530,13 +543,30 @@ public class EmbeddedJettyBuilder {
         return false;
     }
 
-    Server getServer() {
+    public Server getServer() {
         return server;
     }
 
     public void addLifecycleListener(LifeCycle.Listener listener) {
         server.addLifeCycleListener(listener);
     }
+
+    public static class FilterBuilder<O> {
+        private final FilterHolder filterHolder;
+        private final O owner;
+
+        public FilterBuilder(FilterHolder filterHolder, O owner) {
+            this.filterHolder = filterHolder;
+            this.owner = owner;
+        }
+
+        public FilterBuilder<O> addInitParameter(String key, String value) {
+            filterHolder.setInitParameter(key, value);
+            return this;
+        }
+
+        public O done() {
+            return owner;
+        }
+    }
 }
-
-

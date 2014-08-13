@@ -18,18 +18,14 @@ public class JspTest {
         EmbeddedJettyBuilder builder = getBuilder();
 
         ServletContextHandlerBuilder<WebAppContext> ctx = builder.createRootWebAppContext("", Resource.newClassPathResource("/jsp-test"));
-        ctx.setResourceHandler(builder.createWebAppClasspathResourceHandler());
-
-//        Server server = builder.buildJetty();
-
-//        WebAppContext handler = ctx.getHandler();
-//        handler.setAttribute(
-//                "org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern",
-//                ".*/[^/]*servlet-api-[^/]*\\.jar$|.*/javax.servlet.jsp.jstl-.*\\.jar$|.*/[^/]*taglibs.*\\.jar$");
 
         builder.startJetty();
         Thread.sleep(100 * 1000);
         builder.stopJetty();
+    }
+
+    public static void main(String[] args) throws Exception {
+        new JspTest().testCreateRootContextHandler();
     }
 
     private EmbeddedJettyBuilder getBuilder() {
