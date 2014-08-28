@@ -4,6 +4,7 @@ import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.SecurityHandler;
 import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.server.handler.*;
+import org.eclipse.jetty.servlet.DefaultServlet;
 import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHandler;
@@ -12,6 +13,7 @@ import org.eclipse.jetty.util.component.LifeCycle;
 import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.util.security.Constraint;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
+import org.eclipse.jetty.webapp.AbstractConfiguration;
 import org.eclipse.jetty.webapp.Configuration;
 import org.eclipse.jetty.webapp.WebAppContext;
 
@@ -26,7 +28,6 @@ import java.util.*;
 import static java.awt.Desktop.getDesktop;
 import static java.lang.String.format;
 import static java.net.InetAddress.getLocalHost;
-
 
 /**
  * A jetty builder that can handle "all" jetty building needs with a fluent api ;)
@@ -49,6 +50,7 @@ public class EmbeddedJettyBuilder {
     private boolean shouldExportMBeans;
     private QueuedThreadPool queuedThreadPool;
     private boolean shouldSendVersionNumber;
+    private boolean useFileMappedBuffer;
 
     /**
      * Create a new builder.
@@ -65,6 +67,9 @@ public class EmbeddedJettyBuilder {
         this.contextPath = context.getContextPath();
         this.port = context.getPort();
         this.devMode = devMode;
+
+        // Disable useFileMappedBuffer in development mode.
+        useFileMappedBuffer = !devMode;
     }
 
     public EmbeddedJettyBuilder exportMBeans() {
@@ -88,6 +93,11 @@ public class EmbeddedJettyBuilder {
 
     public EmbeddedJettyBuilder withThreadPool(QueuedThreadPool queuedThreadPool) {
         this.queuedThreadPool = queuedThreadPool;
+        return this;
+    }
+
+    public EmbeddedJettyBuilder withUseFileMappedBuffer(boolean useFileMappedBuffer) {
+        this.useFileMappedBuffer = useFileMappedBuffer;
         return this;
     }
 
@@ -347,7 +357,47 @@ public class EmbeddedJettyBuilder {
             Logger.debug(getClass(), "JSP support is not enabled, add a dependency on apache-jsp.");
         }
 
+        if (!useFileMappedBuffer) {
+            classlist.add(DisableFileMappedBufferConfiguration.class.getName());
+        }
+
         return server;
+    }
+
+    /**
+     * This is a hack to get the default servlet to not use file mapping buffers when serving files. The effect is that
+     * Jetty reloads the file on every read but it also does not lock the file which is good for development.
+     */
+    public static class DisableFileMappedBufferConfiguration extends AbstractConfiguration {
+        @Override
+        public void configure(WebAppContext context) throws Exception {
+            ServletContextHandler.Decorator useFileMappedBuffer = new ServletContextHandler.Decorator() {
+                @Override
+                public <T> T decorate(T o) {
+                    if (o instanceof DefaultServlet) {
+                        Class<T> klass = (Class<T>) o.getClass();
+
+                        return klass.cast(new DefaultServlet() {
+                            @Override
+                            public String getInitParameter(String name) {
+                                if (name.equals("useFileMappedBuffer")) {
+                                    return "false";
+                                }
+
+                                return super.getInitParameter(name);
+                            }
+                        });
+                    }
+                    return o;
+                }
+
+                @Override
+                public void destroy(Object o) {
+                }
+            };
+
+            context.addDecorator(useFileMappedBuffer);
+        }
     }
 
     Server buildJetty() {
