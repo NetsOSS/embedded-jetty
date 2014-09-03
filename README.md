@@ -5,38 +5,12 @@ Provides a simple way of building embedded Jetty instances that allows for web.x
 
 How to use
 ----------
+
 See https://github.com/NetsOSS/embedded-jetty-sample
 
-Versioning
-----------
 
-The artifact version number tracks the Jetty version, e.g. 1.0+9.0 tracks the 9.0.x versions of Jetty.
+Documentation
+-------------
 
-Patch strategy
---------------
-Patches are generally created on the oldest applicable jetty version and merged or cherry picked to
-the future versions.
+The project Wiki serves as an additional source of information. See https://github.com/NetsOSS/embedded-jetty/wiki.
 
-JSP
----
-
-To enable JSP support add these dependencies to your project:
-
-    <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>apache-jsp</artifactId>
-      <version>${jetty.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>apache-jstl</artifactId>
-      <version>${jetty.version}</version>
-    </dependency>
-
-The `jetty-annotations` jar is also required:
-
-    <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-annotations</artifactId>
-      <version>${jetty.version}</version>
-    </dependency>
