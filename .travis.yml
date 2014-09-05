@@ -6,4 +6,5 @@ env:
     - SONATYPE_USERNAME=runepeter
     - secure: "ps3aPpI2eF3KY2YDtKjh+ecKbl0xg7Mo766hKySF7Cd2ifYqnmD5wPyH2IqlNecksav3tYDmp+iObpz/adgA+MOc3VzXAP6JNIrPahzPulNEyrHA9A4RAaOKbJTIuEyzpXJyleR2w76xyCE7Y8d4p82CtmAd0+Z2cYVnXQ8XCik="
 after_success:
-  - mvn deploy
+  - python addServer.py
+  - mvn clean deploy --settings ~/.m2/mySettings.xml
