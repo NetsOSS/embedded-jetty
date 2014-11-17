@@ -30,7 +30,7 @@ public class AccessLogTest {
 
     @BeforeClass
     public static void startJetty() {
-        EmbeddedJettyBuilder builder = getBuilder();
+        EmbeddedJettyBuilder builder = getBuilder().createServer();
         EmbeddedJettyBuilder.ServletContextHandlerBuilder handlerBuilder = builder.createRootServletContextHandler("", new RequestLogEmpty() {
             @Override
             public void log(Request request, Response response) {
