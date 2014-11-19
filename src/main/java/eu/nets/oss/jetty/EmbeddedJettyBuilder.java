@@ -1,26 +1,16 @@
 package eu.nets.oss.jetty;
 
+import org.eclipse.jetty.http.HttpScheme;
+import org.eclipse.jetty.http.HttpVersion;
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.SecurityHandler;
-import org.eclipse.jetty.server.Handler;
-import org.eclipse.jetty.server.HttpConfiguration;
-import org.eclipse.jetty.server.HttpConnectionFactory;
-import org.eclipse.jetty.server.RequestLog;
-import org.eclipse.jetty.server.SecureRequestCustomizer;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.ServerConnector;
-import org.eclipse.jetty.server.SslConnectionFactory;
-import org.eclipse.jetty.server.handler.ContextHandler;
-import org.eclipse.jetty.server.handler.HandlerList;
-import org.eclipse.jetty.server.handler.IPAccessHandler;
-import org.eclipse.jetty.server.handler.RequestLogHandler;
-import org.eclipse.jetty.server.handler.ResourceHandler;
+import org.eclipse.jetty.server.*;
+import org.eclipse.jetty.server.handler.*;
 import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.component.LifeCycle;
 import org.eclipse.jetty.util.log.JavaUtilLog;
-import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.util.security.Constraint;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
@@ -29,18 +19,9 @@ import javax.servlet.DispatcherType;
 import javax.servlet.Filter;
 import javax.servlet.Servlet;
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.URI;
-import java.net.UnknownHostException;
+import java.net.*;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.EnumSet;
-import java.util.EventListener;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import static java.awt.Desktop.getDesktop;
 import static java.lang.String.format;
@@ -68,9 +49,8 @@ public class EmbeddedJettyBuilder {
     private boolean shouldExportMBeans;
     private QueuedThreadPool queuedThreadPool;
     private boolean shouldSendVersionNumber;
-    private String keystore;
-    private String keystorePassword;
-    private int sslPort;
+
+    private HttpsServerConfig httpsServerConfig;
 
     /**
      *Create a new builder.
@@ -108,12 +88,12 @@ public class EmbeddedJettyBuilder {
         return this;
     }
 
-    public EmbeddedJettyBuilder setKeystore(String keystore, String keystorePassword, int sslPort) {
-        this.keystore = keystore;
-        this.keystorePassword = keystorePassword;
-        this.sslPort = sslPort;
+
+    public EmbeddedJettyBuilder setHttpsServerConfig(HttpsServerConfig httpsConfig) {
+        this.httpsServerConfig = httpsConfig;
         return this;
     }
+
 
     public EmbeddedJettyBuilder withThreadPool(QueuedThreadPool queuedThreadPool) {
         this.queuedThreadPool = queuedThreadPool;
@@ -286,6 +266,8 @@ public class EmbeddedJettyBuilder {
         // While there may be a decent production case for this, it is error prone on local workstation.
         // todo: Determine if we need to support this for production purposes.
 
+        long idleTimeOut = devMode ? 1000000 : 30000;
+
         failIfPortIsTaken(port);
         if (queuedThreadPool == null) {
             queuedThreadPool = new QueuedThreadPool();
@@ -301,11 +283,9 @@ public class EmbeddedJettyBuilder {
 
         ServerConnector connector = new ServerConnector(server, new HttpConnectionFactory(http_config));
         connector.setPort(port);
+        connector.setIdleTimeout(idleTimeOut);
 
-        if (devMode) {
-            connector.setIdleTimeout(1000000);
-        } else {
-            connector.setIdleTimeout(30000);
+        if (!devMode) {
             server.setStopAtShutdown(true);
             server.setStopTimeout(2000);
         }
@@ -313,28 +293,26 @@ public class EmbeddedJettyBuilder {
         server.addConnector(connector);
 
 
-        if (keystore != null) {
-            HttpConfiguration https_config = new HttpConfiguration();
-            https_config.setSecureScheme("https");
-            https_config.setSecurePort(sslPort);
+        if (httpsServerConfig != null) {
+            HttpConfiguration https_config = new HttpConfiguration(http_config);
+            https_config.setSecureScheme(HttpScheme.HTTPS.asString());
+            https_config.setSecurePort(httpsServerConfig.getHttpsServerPort());
             https_config.addCustomizer(new SecureRequestCustomizer());
 
-            SslContextFactory sslContextFactory = new SslContextFactory();
+            SslContextFactory sslContextFactory = httpsServerConfig.createSslContextFactory();
 
-            sslContextFactory.setKeyStoreResource(Resource.newClassPathResource(keystore));
-            sslContextFactory.setKeyStorePassword(keystorePassword);
+            ServerConnector sslConnector = new ServerConnector(
+                    server,
+                    new SslConnectionFactory(sslContextFactory, HttpVersion.HTTP_1_1.asString()),
+                    new HttpConnectionFactory(https_config)
+            );
 
-            ServerConnector sslConnector = new ServerConnector(server, new SslConnectionFactory(sslContextFactory, "http/1.1"), new HttpConnectionFactory(https_config));
-            sslConnector.setPort(sslPort);
-
-            if (devMode) {
-                sslConnector.setIdleTimeout(1000000);
-            } else {
-                sslConnector.setIdleTimeout(500000);
-            }
+            sslConnector.setPort(httpsServerConfig.getHttpsServerPort());
+            sslConnector.setIdleTimeout(idleTimeOut);
 
             server.addConnector(sslConnector);
         }
+
 
 
         return server;
