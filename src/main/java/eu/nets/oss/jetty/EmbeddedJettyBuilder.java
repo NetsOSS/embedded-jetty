@@ -4,8 +4,19 @@ import org.eclipse.jetty.http.HttpScheme;
 import org.eclipse.jetty.http.HttpVersion;
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.SecurityHandler;
-import org.eclipse.jetty.server.*;
-import org.eclipse.jetty.server.handler.*;
+import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.HttpConfiguration;
+import org.eclipse.jetty.server.HttpConnectionFactory;
+import org.eclipse.jetty.server.RequestLog;
+import org.eclipse.jetty.server.SecureRequestCustomizer;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.SslConnectionFactory;
+import org.eclipse.jetty.server.handler.ContextHandler;
+import org.eclipse.jetty.server.handler.HandlerList;
+import org.eclipse.jetty.server.handler.IPAccessHandler;
+import org.eclipse.jetty.server.handler.RequestLogHandler;
+import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
@@ -17,11 +28,21 @@ import org.eclipse.jetty.util.thread.QueuedThreadPool;
 
 import javax.servlet.DispatcherType;
 import javax.servlet.Filter;
+import javax.servlet.MultipartConfigElement;
 import javax.servlet.Servlet;
 import java.io.IOException;
-import java.net.*;
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.URI;
+import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.EnumSet;
+import java.util.EventListener;
+import java.util.LinkedList;
+import java.util.List;
 
 import static java.awt.Desktop.getDesktop;
 import static java.lang.String.format;
@@ -178,6 +199,11 @@ public class EmbeddedJettyBuilder {
 
         public ServletHolderBuilder setInitParameter(String param, String value) {
             sh.setInitParameter(param, value);
+            return this;
+        }
+
+        public ServletHolderBuilder setMultipartConfig(MultipartConfigElement multipartConfig) {
+            sh.getRegistration().setMultipartConfig(multipartConfig);
             return this;
         }
     }
