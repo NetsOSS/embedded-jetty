@@ -8,10 +8,12 @@ import java.nio.charset.Charset;
  * Loading Secure environment properties AFTER the regular environment.properties.
  * It is important to read AFTER, so that the secure props cannot be overridden by regular env props.
  *
- * Secure Environment Properties shall only be readable from file - not in classpath.
+ * Secure Environment Properties shall only be readable from file - never from class path.
  */
 public class SecurePropertiesFileConfig extends PropertiesFileConfig {
 
+
+    private final String fileName = "secure/secure-environment.properties";
 
     public SecurePropertiesFileConfig() {
         super();
@@ -22,7 +24,7 @@ public class SecurePropertiesFileConfig extends PropertiesFileConfig {
 
     private void applySecureEnvironment() {
         InputStream is;
-        File envFile = new File(getBasedir(), "secure/secure-environment.properties");
+        File envFile = new File(getBasedir(), fileName);
 
         if (envFile.exists()){
             try {
@@ -33,9 +35,11 @@ public class SecurePropertiesFileConfig extends PropertiesFileConfig {
                 System.getProperties().load(reader);
 
             } catch (IOException e) {
-                Logger.warn(this.getClass(), "Could not load 'secure/secure-environment.properties', using system defaults");
+                Logger.warn(this.getClass(), "Could not load '" + fileName  + "', using system defaults");
             }
 
+        } else {
+            Logger.warn(this.getClass(), "No file '" + fileName  + "' found.");
         }
 
     }
