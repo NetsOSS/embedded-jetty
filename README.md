@@ -1,19 +1,17 @@
 Embedded Jetty
 ==============
+![travis-ci status](https://travis-ci.org/NetsOSS/embedded-jetty.svg?branch=master)
 
 Provides a simple way of building embedded Jetty instances that allows for web.xml-free startup. The resulting application is identical within your IDE and your actual application deployment environment.
 
 How to use
 ----------
+
 See https://github.com/NetsOSS/embedded-jetty-sample
 
-Versioning
-----------
 
-The artifact version number tracks the Jetty version, e.g. 1.0+9.0 tracks the 9.0.x versions of Jetty.
+Documentation
+-------------
 
-Patch strategy
---------------
-Patches are generally created on the oldest applicable jetty version and merged or cherry picked to
-the future versions.
+The project Wiki serves as an additional source of information. See https://github.com/NetsOSS/embedded-jetty/wiki.
 

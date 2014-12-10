@@ -1,6 +1,9 @@
 package eu.nets.oss.jetty;
 
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 import org.junit.Test;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.mock.web.MockServletConfig;
@@ -9,10 +12,8 @@ import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.ws.transport.http.MessageDispatcherServlet;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-
-import static eu.nets.oss.jetty.EmbeddedSpringBuilder.*;
+import static eu.nets.oss.jetty.EmbeddedSpringBuilder.createApplicationContext;
+import static eu.nets.oss.jetty.EmbeddedSpringBuilder.createSpringContextLoader;
 import static eu.nets.oss.jetty.EmbeddedSpringWsBuilder.createMessageDispatcherServlet;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -21,6 +22,11 @@ import static org.junit.Assert.assertNotNull;
  * @author Kristian Rosenvold
  */
 public class EmbeddedSpringBuilderTest {
+
+    static {
+        SLF4JBridgeHandler.removeHandlersForRootLogger();
+        SLF4JBridgeHandler.install();
+    }
 
     @Test
     public void testCreateApplicationContext() throws Exception {
