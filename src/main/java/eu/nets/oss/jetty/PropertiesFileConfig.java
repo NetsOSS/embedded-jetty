@@ -46,7 +46,7 @@ public class PropertiesFileConfig implements ContextPathConfig {
         }
     }
 
-    private String getBasedir() {
+    protected String getBasedir() {
         String path = System.getProperty("basedir");
         // cygwin hack
         if (path != null && path.startsWith("/cygdrive")) {

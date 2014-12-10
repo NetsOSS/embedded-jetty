@@ -14,10 +14,6 @@ import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.util.thread.ThreadPool;
 import org.junit.Test;
 
-import eu.nets.oss.jetty.ContextPathConfig;
-import eu.nets.oss.jetty.EmbeddedJettyBuilder;
-import eu.nets.oss.jetty.StaticConfig;
-
 import javax.servlet.DispatcherType;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -25,10 +21,10 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-
 import java.io.IOException;
 import java.net.BindException;
 import java.net.ServerSocket;
+import java.util.Collection;
 import java.util.EnumSet;
 
 import static junit.framework.TestCase.assertEquals;
@@ -52,7 +48,7 @@ public class EmbeddedJettyBuilderTest {
         String path = "/def";
         builder.createRootContextHandler(path);
         assertEquals(1, builder.handlers.size());
-        ContextHandler handler = getFirstHandler(builder.buildJetty());
+        ContextHandler handler = getFirstHandler(builder.createServer().buildJetty());
         assertEquals(contextPath + path, handler.getContextPath());
     }
 
@@ -63,13 +59,13 @@ public class EmbeddedJettyBuilderTest {
         String path = "/deb";
         builder.createRootServletContextHandler( path );
         assertEquals(1, builder.handlers.size());
-        ServletContextHandler handler = getFirstHandler(builder.buildJetty());
+        ServletContextHandler handler = getFirstHandler(builder.createServer().buildJetty());
         assertEquals(contextPath + path, handler.getContextPath());
     }
 
     @Test
     public void testAddFilter() throws Exception {
-        EmbeddedJettyBuilder builder = getBuilder();
+        EmbeddedJettyBuilder builder = getBuilder().createServer();
         String path = "/deb";
         EmbeddedJettyBuilder.ServletContextHandlerBuilder hdl = builder.createRootServletContextHandler( path );
         TestFilter filter = new TestFilter();
@@ -87,7 +83,7 @@ public class EmbeddedJettyBuilderTest {
         TestFilter filter = new TestFilter();
         FilterHolder fh = new FilterHolder( filter  );
         hdl.addFilterHolder( fh, "/foo", EnumSet.of( DispatcherType.REQUEST ) );
-        ServletContextHandler handler = getFirstHandler( builder.buildJetty() );
+        ServletContextHandler handler = getFirstHandler(builder.createServer().buildJetty());
         FilterHolder filterHolder = handler.getServletHandler().getFilters()[0];
         assertTrue(  fh == filterHolder);
         assertTrue(  filter == filterHolder.getFilter());
@@ -96,9 +92,10 @@ public class EmbeddedJettyBuilderTest {
     @Test
     public void testHeaderSizeSetCorrectly() throws Exception {
         ContextPathConfig config = new StaticConfig(contextPath, port);
-        EmbeddedJettyBuilder builder = new EmbeddedJettyBuilder(config, true, 1900);
+        EmbeddedJettyBuilder builder = new EmbeddedJettyBuilder(config, true, 1900).createServer();
         ServerConnector conn = (ServerConnector)builder.buildJetty().getServer().getConnectors()[0];
-        HttpConnectionFactory factory = (HttpConnectionFactory)conn.getConnectionFactories().toArray(new ConnectionFactory[]{})[0];
+        Collection<ConnectionFactory> connectionFactories = conn.getConnectionFactories();
+        HttpConnectionFactory factory = (HttpConnectionFactory) connectionFactories.toArray(new ConnectionFactory[connectionFactories.size()])[0];
         HttpConfiguration httpConfiguration = factory.getHttpConfiguration();
         
         assertThat(httpConfiguration.getRequestHeaderSize(), is(equalTo(1900)));
@@ -108,7 +105,7 @@ public class EmbeddedJettyBuilderTest {
     @Test
     public void thatCustomThreadPoolIsUsed() throws Exception {
         EmbeddedJettyBuilder builder = getBuilder();
-        builder.withThreadPool(new QueuedThreadPool(20, 5));
+        builder.withThreadPool(new QueuedThreadPool(20, 5)).createServer();
         ThreadPool.SizedThreadPool threadPool = (ThreadPool.SizedThreadPool )builder.buildJetty().getServer().getThreadPool();
         assertThat(threadPool.getMaxThreads(), is(20));
         assertThat(threadPool.getMinThreads(), is(5));
@@ -117,7 +114,7 @@ public class EmbeddedJettyBuilderTest {
 
     @Test
     public void thatUsesDefaultThreadPoolWhenNotSet() throws Exception {
-        EmbeddedJettyBuilder builder = getBuilder();
+        EmbeddedJettyBuilder builder = getBuilder().createServer();
         ThreadPool.SizedThreadPool threadPool = (ThreadPool.SizedThreadPool )builder.buildJetty().getServer().getThreadPool();
         assertThat(threadPool.getMaxThreads(), is(200));
     }
@@ -141,7 +138,7 @@ public class EmbeddedJettyBuilderTest {
     @Test
     public void testStartStopJetty() throws Exception {
 
-        EmbeddedJettyBuilder builder = getBuilder();
+        EmbeddedJettyBuilder builder = getBuilder().createServer();
         builder.justStartJetty();
         // Maybe assert that port is taken
         try {
