@@ -1,18 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-<!--
-  <parent>
-    <groupId>eu.nets.oss.maven</groupId>
-    <artifactId>nets-oss-parent</artifactId>
-    <version>1</version>
-  </parent>
-  -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
     <parent>
-        <groupId>eu.nets.utils.maven</groupId>
-        <artifactId>distributionmanagement-pom</artifactId>
-        <version>1.0.0</version>
-        <relativePath />
+        <groupId>eu.nets.oss.maven</groupId>
+        <artifactId>nets-oss-parent</artifactId>
+        <version>1</version>
     </parent>
 
     <groupId>eu.nets.oss.jetty</groupId>
@@ -34,7 +28,7 @@
         <spring.version>4.1.1.RELEASE</spring.version>
         <spring-ws-core.version>2.1.4.RELEASE</spring-ws-core.version>
 
-<!--        <jetty.version>9.3.0.M1</jetty.version> -->
+        <!--        <jetty.version>9.3.0.M1</jetty.version> -->
         <jetty.version>9.2.5.v20141112</jetty.version>
         <wicket.version>6.13.0</wicket.version>
         <slf4j.version>1.7.5</slf4j.version>
@@ -173,7 +167,6 @@
         </dependency>
     </dependencies>
 
-    <!--
     <distributionManagement>
         <snapshotRepository>
             <id>sonatype-nexus-snapshots</id>
@@ -181,6 +174,5 @@
             <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
-    -->
 
 </project>
