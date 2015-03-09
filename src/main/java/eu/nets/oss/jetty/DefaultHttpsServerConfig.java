@@ -41,8 +41,9 @@ public class DefaultHttpsServerConfig implements HttpsServerConfig {
         SslContextFactory sslContextFactory = new SslContextFactory();
         sslContextFactory.setKeyStoreResource(httpsServerKeyStoreResource);
         sslContextFactory.setKeyStorePassword(httpsServerKeyStorePassword);
-        sslContextFactory.setProtocol("TLSv1.2");
 
+        sslContextFactory.setIncludeProtocols("TLSv1.1", "TLSv1.2");
+        
         sslContextFactory.setExcludeCipherSuites( // Explicitly disable weak ciphers.
                 "SSL_RSA_WITH_DES_CBC_SHA",
                 "SSL_DHE_RSA_WITH_DES_CBC_SHA",
