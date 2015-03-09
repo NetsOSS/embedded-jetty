@@ -31,6 +31,7 @@
         <tag>embedded-jetty_9.2-1.2</tag>
     </scm>
 -->
+    <!-- NOTE: At bottom is distributionManagement - remember to uncomment -->
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -194,6 +195,7 @@
         </dependency>
     </dependencies>
 
+    <!--
     <distributionManagement>
         <snapshotRepository>
             <id>sonatype-nexus-snapshots</id>
@@ -206,7 +208,8 @@
             <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
     </distributionManagement>
-
+-->
+    
     <profiles>
         <profile>
             <id>netsoss</id>
