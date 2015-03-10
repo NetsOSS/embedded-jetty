@@ -6,10 +6,15 @@ import org.eclipse.jetty.util.ssl.SslContextFactory;
 
 public class DefaultHttpsServerConfig implements HttpsServerConfig {
 
+    private static final String[] DEFAULT_PROTOCOLS = new String[] { "TLSv1.1", "TLSv1.2" };
+    private String[] protocols;
+    
     int httpsServerPort = -1;
     private Resource httpsServerKeyStoreResource;
     private String httpsServerKeyStorePassword;
-
+    
+    
+    
     public DefaultHttpsServerConfig() {
         String httpsServerPortProperty = System.getProperty("https.server.port");
         String httpsServerKeyStorePathProperty = System.getProperty("https.server.key.store.path");
@@ -28,8 +33,15 @@ public class DefaultHttpsServerConfig implements HttpsServerConfig {
         httpsServerPort = Integer.valueOf(httpsServerPortProperty);
         httpsServerKeyStoreResource = Resource.newClassPathResource(httpsServerKeyStorePathProperty);
         httpsServerKeyStorePassword = httpsServerKeyStorePasswordProperty;
-    }
 
+        protocols = DEFAULT_PROTOCOLS;
+    }
+    
+    
+    public void setProtocols(String[] protocols) {
+        this.protocols = protocols;
+    }
+    
 
     @Override
     public int getHttpsServerPort() {
@@ -42,7 +54,7 @@ public class DefaultHttpsServerConfig implements HttpsServerConfig {
         sslContextFactory.setKeyStoreResource(httpsServerKeyStoreResource);
         sslContextFactory.setKeyStorePassword(httpsServerKeyStorePassword);
 
-        sslContextFactory.setIncludeProtocols("TLSv1.1", "TLSv1.2");
+        sslContextFactory.setIncludeProtocols(protocols);
         
         sslContextFactory.setExcludeCipherSuites( // Explicitly disable weak ciphers.
                 "SSL_RSA_WITH_DES_CBC_SHA",
