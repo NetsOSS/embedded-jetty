@@ -11,7 +11,7 @@
     <groupId>eu.nets.oss.jetty</groupId>
     <artifactId>embedded-jetty_9.2</artifactId>
     <packaging>jar</packaging>
-    <version>1.3-SNAPSHOT</version>
+    <version>1.2.2</version>
     <name>embedded-jetty</name>
     <description>Code for starting embedded Jetty.</description>
 
@@ -208,7 +208,7 @@
                         <version>1.6.5</version>
                         <extensions>true</extensions>
                         <configuration>
-                            <nexusUrl>http://oss.sonatype.org/</nexusUrl>
+                            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
                             <serverId>sonatype-nexus-staging</serverId>
                             <stagingProfileId>1fce6f34bb9633</stagingProfileId>
                         </configuration>
