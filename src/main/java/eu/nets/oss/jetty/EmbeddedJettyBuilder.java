@@ -39,6 +39,7 @@ import static java.net.InetAddress.getLocalHost;
  * @author Kristian Rosenvold
  */
 public class EmbeddedJettyBuilder {
+
     private Server server;
     private final String contextPath;
     private final int port;
@@ -56,7 +57,7 @@ public class EmbeddedJettyBuilder {
     private HttpsServerConfig httpsServerConfig;
 
     /**
-     *Create a new builder.
+     * Create a new builder.
      *
      * @param context The context defining the root path and port of the application
      * @param devMode true to run in development mode, which normally caches less content.
@@ -185,7 +186,17 @@ public class EmbeddedJettyBuilder {
     public static class WebAppContextBuilder extends ServletContextHandlerBuilder<WebAppContext> {
         public WebAppContextBuilder(WebAppContext handler, Resource baseResource) {
             super(handler);
-            handler.setBaseResource(baseResource);
+            if (baseResource.isDirectory()) {
+                handler.setBaseResource(baseResource);
+                Logger.debug(EmbeddedJettyBuilder.class, "Using directory [" + baseResource + "] as web application context.");
+            } else {
+                try {
+                    handler.setWar(baseResource.getFile().getAbsolutePath());
+                    Logger.debug(EmbeddedJettyBuilder.class, "Using file [" + baseResource + "] as web application context.");
+                } catch (IOException e) {
+                    throw new RuntimeException("Unable to set [" + baseResource + "] as WAR.", e);
+                }
+            }
         }
     }
 
@@ -376,7 +387,6 @@ public class EmbeddedJettyBuilder {
         }
 
 
-
         if (httpsServerConfig != null) {
             HttpConfiguration https_config = new HttpConfiguration(http_config);
             https_config.setSecureScheme(HttpScheme.HTTPS.asString());
@@ -396,7 +406,6 @@ public class EmbeddedJettyBuilder {
 
             server.addConnector(sslConnector);
         }
-
 
 
         return server;
