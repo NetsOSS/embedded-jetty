@@ -14,7 +14,6 @@ import java.util.EventListener;
 
 import static com.google.common.base.Throwables.propagate;
 import static eu.nets.oss.jetty.EmbeddedSpringBuilder.createSpringContextLoader;
-import static eu.nets.oss.jetty.EmbeddedSpringWsBuilder.createMessageDispatcherServlet;
 import static eu.nets.oss.jetty.EmbeddedWicketBuilder.addWicketHandler;
 
 public class StartJetty {
@@ -36,28 +35,16 @@ public class StartJetty {
             builder.addHttpAccessLogAtRoot();
         }
 
-        WebApplicationContext ctx = EmbeddedSpringBuilder.createApplicationContext("VAS Core Application Context", ApplicationConfiguration.class);
+        WebApplicationContext ctx = EmbeddedSpringBuilder.createApplicationContext("Embedded Jetty Wicket Example Application", ApplicationConfiguration.class);
         EventListener springContextLoader = createSpringContextLoader(ctx);
-//        builder.addKeystore(10000);
 
-        builder.createRootServletContextHandler("/ws")
-                .addEventListener(springContextLoader)
-                .addServlet(createMessageDispatcherServlet(WsServletConfiguration.class))
-                .mountAtPath("/helloService.wsdl")
-                .mountAtPath("/helloService");
-
-
-        // Option 1: Separate context
         ClasspathResourceHandler rh1 = builder.createWebAppClasspathResourceHandler();
         builder.createRootServletContextHandler("/res").setResourceHandler(rh1);
 
-        // Alt 2: Put resource handler on same path as wicket
-        ClasspathResourceHandler rh2 = builder.createWebAppClasspathResourceHandler();
-        EmbeddedJettyBuilder.ServletContextHandlerBuilder servletContextHandlerBuilder = addWicketHandler(builder, "/wicket", springContextLoader, SampleWicketApplication.class, true);
-        // Temporary disabled while we're waiting for the outcome of a jetty bug on this
-        servletContextHandlerBuilder.setResourceHandler(rh2);
+        addWicketHandler(builder, "/wicket", springContextLoader, SampleWicketApplication.class, true);
+
         try {
-            builder.startJetty();
+            builder.createServer().startJetty();
             builder.verifyServerStartup();
         } catch (Exception e) {
             //noinspection ThrowableResultOfMethodCallIgnored

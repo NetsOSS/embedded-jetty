@@ -70,6 +70,7 @@ public class AccessLogTest {
         URL url = new URL(String.format("http://localhost:%d%s/test/found/abc", port, contextPath));
         try (InputStream is = url.openStream()) {
         }
+        Thread.sleep(1000);
         assertEquals(200, lastStatus.get());
 
         url = new URL(String.format("http://localhost:%d%s/test/notfound/abc", port, contextPath));

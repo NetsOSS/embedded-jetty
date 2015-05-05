@@ -11,4 +11,5 @@ data/*.xml
 Xpp3Dom
 logs
 release.properties
+tree.txt
 

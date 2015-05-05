@@ -57,6 +57,36 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>1.4</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <rules>
+                        <bannedDependencies>
+                            <excludes>
+                                <exclude>log4j</exclude>
+                                <exclude>*:slf4j-log4j12</exclude>
+                                <exclude>commons-logging</exclude>
+                            </excludes>
+                        </bannedDependencies>
+                        <requireSameVersions>
+                            <dependencies>
+                                <dependency>org.springframework</dependency>
+                                <dependency>org.apache.wicket</dependency>
+                            </dependencies>
+                        </requireSameVersions>
+                    </rules>
+                    <fail>true</fail>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
                 <version>2.4</version>
                 <executions>
