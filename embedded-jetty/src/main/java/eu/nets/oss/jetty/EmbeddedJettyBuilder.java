@@ -544,7 +544,7 @@ public class EmbeddedJettyBuilder {
             }
         }
 
-        // This can probably be removed after verifyStartup() was made, but I'm not sure how to check it.
+        // This can probably be removed aftestr verifyStartup() was made, but I'm not sure how to check it.
         if (!startupExceptions.isEmpty()) {
             Exception exception = startupExceptions.peekFirst();
             Logger.warn(getClass(), format("Errors during startup. The first is %s: %s", exception.getClass().getName(), exception.getMessage()));

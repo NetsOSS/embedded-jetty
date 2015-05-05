@@ -41,13 +41,17 @@ public class StartJetty {
         ClasspathResourceHandler rh1 = builder.createWebAppClasspathResourceHandler();
         builder.createRootServletContextHandler("/res").setResourceHandler(rh1);
 
+        // Serve org.webjars resources:
+        ClasspathResourceHandler rh2 = new ClasspathResourceHandler("/META-INF/resources/webjars", onServer);
+        builder.createRootServletContextHandler("/assets")
+                .setClassLoader(Thread.currentThread().getContextClassLoader())
+                .setResourceHandler(rh2);
+
         addWicketHandler(builder, "/wicket", springContextLoader, SampleWicketApplication.class, true);
 
         try {
             builder.createServer().startJetty();
-            builder.verifyServerStartup();
         } catch (Exception e) {
-            //noinspection ThrowableResultOfMethodCallIgnored
             propagate(e);
         }
 

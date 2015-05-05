@@ -78,6 +78,11 @@
             <artifactId>guava</artifactId>
             <version>18.0</version>
         </dependency>
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>bootstrap</artifactId>
+            <version>3.3.4</version>
+        </dependency>
 
         <!--dependency>
             <groupId>org.eclipse.jetty</groupId>

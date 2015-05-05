@@ -9,6 +9,6 @@ public class DefaultHelloService implements HelloService {
         if (name == null) {
             return "Hello, Stranger!";
         }
-        return "Hello, " + name;
+        return "Hello, " + name + " (" + System.currentTimeMillis() + ")";
     }
 }
