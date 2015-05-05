@@ -8,6 +8,7 @@ deploy:
   app: netsoss-embedded-jetty-sample
   on:
     repo: NetsOSS/embedded-jetty
+    branch: 3.x
 env:
   global:
     - SONATYPE_USERNAME=runepeter
