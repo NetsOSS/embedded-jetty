@@ -1,6 +1,13 @@
 language: java
 jdk:
   - oraclejdk8
+deploy:
+  provider: heroku
+  api_key:
+    secure: JptpsY/h9/L9FO2L78onvMXOFolPW0nR0Ksm1Bu9NaXSk3xb93fHmGYf10lFQU7bAxkcmeGQEAY/ZLCviCNG6o3XrQP6KGR2NahC8JO96Wen9dezaJxPniqRLUrwbri/rPNr3TOf0rFqtBGU25MYFXtq53xvq8Ui7NrHAeMnNA0=
+  app: netsoss-embedded-jetty-sample
+  on:
+    all_branches: true
 env:
   global:
     - SONATYPE_USERNAME=runepeter
