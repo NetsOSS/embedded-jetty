@@ -31,10 +31,10 @@ public class AccessLogTest {
     @BeforeClass
     public static void startJetty() {
         EmbeddedJettyBuilder builder = getBuilder().createServer();
-        EmbeddedJettyBuilder.ServletContextHandlerBuilder handlerBuilder = builder.createRootServletContextHandler("", new RequestLogEmpty() {
+        EmbeddedJettyBuilder.ServletContextHandlerBuilder handlerBuilder = builder.createRootServletContextHandler("", new RequestLog() {
             @Override
-            public void log(Request request, Response response) {
-                lastStatus.set(response.getStatus());
+            public void log(Request request, int status, long written) {
+                lastStatus.set(status);
             }
         });
 
@@ -83,63 +83,6 @@ public class AccessLogTest {
     private static EmbeddedJettyBuilder getBuilder() {
         ContextPathConfig config = new StaticConfig(contextPath, port);
         return new EmbeddedJettyBuilder(config, true);
-    }
-
-    private static class RequestLogEmpty implements RequestLog {
-        @Override
-        public void log(Request request, Response response) {
-
-        }
-
-        @Override
-        public void start() throws Exception {
-
-        }
-
-        @Override
-        public void stop() throws Exception {
-
-        }
-
-        @Override
-        public boolean isRunning() {
-            return false;
-        }
-
-        @Override
-        public boolean isStarted() {
-            return false;
-        }
-
-        @Override
-        public boolean isStarting() {
-            return false;
-        }
-
-        @Override
-        public boolean isStopping() {
-            return false;
-        }
-
-        @Override
-        public boolean isStopped() {
-            return false;
-        }
-
-        @Override
-        public boolean isFailed() {
-            return false;
-        }
-
-        @Override
-        public void addLifeCycleListener(Listener listener) {
-
-        }
-
-        @Override
-        public void removeLifeCycleListener(Listener listener) {
-
-        }
     }
 
 }

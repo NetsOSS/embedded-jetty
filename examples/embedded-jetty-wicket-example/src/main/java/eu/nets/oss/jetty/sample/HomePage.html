@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:wicket="http://wicket.apache.org" lang="en">
+<wicket:head>
+    <title>Embedded Jetty Sample Home Page</title>
+    <link href="css/bootstrap.css" rel="stylesheet"/>
+</wicket:head>
+
+<body>
+<div class="container-fluid" id="homePage">
+    <div class="row-fluid">
+        <div class="span6">
+            <h3>Hello world</h3>
+        </div>
+        <div class="span6">
+            <img src="../res/img/netsLitenTransparent.png"/>
+        </div>
+    </div>
+    <div class="row-fluid">
+        <div class="span6">
+            <a href="../res/css/bootstrap.css">Boostrap.css served as static content</a> <br/>
+            <a href="../ws/helloService.wsdl">The "hello world" webservice WSDL</a>
+        </div>
+        <div class="span6">
+            The url of the images/stylesheets are embedded as a resource handler on the wicket servlet.
+        </div>
+    </div>
+</div>
+</body>
+</html>
