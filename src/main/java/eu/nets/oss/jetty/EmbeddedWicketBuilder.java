@@ -14,14 +14,9 @@ import java.util.EventListener;
  */
 public class EmbeddedWicketBuilder {
 
-    public static EmbeddedJettyBuilder.ServletContextHandlerBuilder addWicketHandler(EmbeddedJettyBuilder embeddedJettyBuilder,
-                                                                                     String contextPath,
-                                                                                     EventListener springContextloader,
+    public static EmbeddedJettyBuilder.ServletContextHandlerBuilder addWicketHandler(EmbeddedJettyBuilder.ServletContextHandlerBuilder wicketHandler,
                                                                                      Class<? extends WebApplication> wicketApplication,
                                                                                      boolean development){
-        EmbeddedJettyBuilder.ServletContextHandlerBuilder wicketHandler = embeddedJettyBuilder.createRootServletContextHandler(contextPath)
-                .setClassLoader(Thread.currentThread().getContextClassLoader())
-                .addEventListener(springContextloader);
         String pathSpec = "/*";
         WicketServlet wicketServlet = new WicketServlet();
         wicketHandler.addServlet(wicketServlet )
@@ -33,6 +28,20 @@ public class EmbeddedWicketBuilder {
                         development ? RuntimeConfigurationType.DEVELOPMENT.name() :  RuntimeConfigurationType.DEPLOYMENT.name());
 
         return wicketHandler;
+    }
+
+    /**
+     * Adds wicket handler at root context.
+     */
+    public static EmbeddedJettyBuilder.ServletContextHandlerBuilder addWicketHandler(EmbeddedJettyBuilder embeddedJettyBuilder,
+                                                                                     String contextPath,
+                                                                                     EventListener springContextloader,
+                                                                                     Class<? extends WebApplication> wicketApplication,
+                                                                                     boolean development){
+        EmbeddedJettyBuilder.ServletContextHandlerBuilder wicketHandler = embeddedJettyBuilder.createRootServletContextHandler(contextPath)
+                .setClassLoader(Thread.currentThread().getContextClassLoader())
+                .addEventListener(springContextloader);
+        return addWicketHandler(wicketHandler, wicketApplication, development);
     }
 
 }
