@@ -13,6 +13,15 @@ import java.util.EventListener;
  */
 public class EmbeddedWicketBuilder {
 
+    public static ServletContextContributor wicket(Class<? extends WebApplication> wicketApplication) {
+        return new ServletContextContributor() {
+            @Override
+            public void contribute(EmbeddedJettyBuilder.ServletContextHandlerBuilder builder) {
+                addWicketHandler(builder, wicketApplication, !EmbeddedJettyBuilder.isStartedWithAppassembler());
+            }
+        };
+    }
+
     public static EmbeddedJettyBuilder.ServletContextHandlerBuilder addWicketHandler(EmbeddedJettyBuilder.ServletContextHandlerBuilder wicketHandler,
                                                                                      Class<? extends WebApplication> wicketApplication,
                                                                                      boolean development) {
@@ -42,6 +51,7 @@ public class EmbeddedWicketBuilder {
         EmbeddedJettyBuilder.ServletContextHandlerBuilder wicketHandler = embeddedJettyBuilder.createRootServletContextHandler(contextPath)
                 .setClassLoader(Thread.currentThread().getContextClassLoader())
                 .addEventListener(springContextloader);
+
         return addWicketHandler(wicketHandler, wicketApplication, development);
     }
 

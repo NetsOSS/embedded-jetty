@@ -17,6 +17,7 @@
 
     <modules>
         <module>embedded-jetty-wicket-example</module>
+        <!--<module>embedded-jetty-jersey-example</module>-->
     </modules>
 
 </project>

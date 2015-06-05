@@ -1,64 +1,40 @@
 package eu.nets.oss.jetty.sample;
 
+import eu.nets.oss.jetty.*;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 
-import eu.nets.oss.jetty.ClasspathResourceHandler;
-import eu.nets.oss.jetty.ContextPathConfig;
-import eu.nets.oss.jetty.EmbeddedJettyBuilder;
-import eu.nets.oss.jetty.EmbeddedSpringBuilder;
-import eu.nets.oss.jetty.PropertiesFileConfig;
-import eu.nets.oss.jetty.StaticConfig;
-import eu.nets.oss.jetty.StdoutRedirect;
-import org.springframework.web.context.WebApplicationContext;
-
-import java.util.EventListener;
-
-import static com.google.common.base.Throwables.propagate;
-import static eu.nets.oss.jetty.EmbeddedSpringBuilder.createSpringContextLoader;
-import static eu.nets.oss.jetty.EmbeddedWicketBuilder.addWicketHandler;
+import static eu.nets.oss.jetty.EmbeddedSpringBuilder.spring;
+import static eu.nets.oss.jetty.EmbeddedWicketBuilder.wicket;
 
 public class StartJetty {
     public static void main(String... args) {
 
-        boolean onServer = EmbeddedJettyBuilder.isStartedWithAppassembler();
+        routeLoggingThroughSlf4j();
 
+        EmbeddedJettyBuilder.create(config())
+                .withAccessLog()
+                .withWebAppClassPathResourceHandler("/res")
+                .withClassPathResourceHandler("/assets", "/META-INF/resources/webjars")
+                .withServletContextContributors("/wicket",
+                        spring(ApplicationConfiguration.class),
+                        wicket(SampleWicketApplication.class))
+                .run();
+    }
+
+    private static void routeLoggingThroughSlf4j() {
+        StdoutRedirect.tieSystemOutAndErrToLog();
+        SLF4JBridgeHandler.removeHandlersForRootLogger();
+        SLF4JBridgeHandler.install();
+    }
+
+    private static ContextPathConfig config() {
         ContextPathConfig config;
-        if (onServer) {
+        if (EmbeddedJettyBuilder.isStartedWithAppassembler()) {
             config = new HerokuConfig(new PropertiesFileConfig());
         } else {
             config = new StaticConfig("/jettySample", 8080);
         }
-
-        final EmbeddedJettyBuilder builder = new EmbeddedJettyBuilder(config, !onServer);
-
-        if (onServer) {
-            StdoutRedirect.tieSystemOutAndErrToLog();
-            builder.addHttpAccessLogAtRoot();
-        }
-
-        WebApplicationContext ctx = EmbeddedSpringBuilder.createApplicationContext("Embedded Jetty Wicket Example Application", ApplicationConfiguration.class);
-        EventListener springContextLoader = createSpringContextLoader(ctx);
-
-        ClasspathResourceHandler rh1 = builder.createWebAppClasspathResourceHandler();
-        builder.createRootServletContextHandler("/res").setResourceHandler(rh1);
-
-        // Serve org.webjars resources:
-        ClasspathResourceHandler rh2 = new ClasspathResourceHandler("/META-INF/resources/webjars", onServer);
-        builder.createRootServletContextHandler("/assets")
-                .setClassLoader(Thread.currentThread().getContextClassLoader())
-                .setResourceHandler(rh2);
-
-        addWicketHandler(builder, "/wicket", springContextLoader, SampleWicketApplication.class, true);
-
-        try {
-            builder.createServer().startJetty();
-        } catch (Exception e) {
-            propagate(e);
-        }
-
-        if (!onServer) {
-            String url = "/wicket/homePage";
-            builder.startBrowserStopWithAnyKey(url);
-        }
+        return config;
     }
 
     private static class HerokuConfig implements ContextPathConfig {

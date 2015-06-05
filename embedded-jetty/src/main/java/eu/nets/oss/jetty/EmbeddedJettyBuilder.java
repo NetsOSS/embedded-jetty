@@ -56,6 +56,18 @@ public class EmbeddedJettyBuilder {
 
     private HttpsServerConfig httpsServerConfig;
 
+    public static EmbeddedJettyBuilder create() {
+        return new EmbeddedJettyBuilder(new SecurePropertiesFileConfig(), !isStartedWithAppassembler());
+    }
+
+    public static EmbeddedJettyBuilder create(ContextPathConfig config) {
+        return new EmbeddedJettyBuilder(config, !isStartedWithAppassembler());
+    }
+
+    public static EmbeddedJettyBuilder create(String contextPath, int port) {
+        return new EmbeddedJettyBuilder(new StaticConfig(contextPath, port), !isStartedWithAppassembler());
+    }
+
     /**
      * Create a new builder.
      *
@@ -110,6 +122,59 @@ public class EmbeddedJettyBuilder {
     public EmbeddedJettyBuilder withUseFileMappedBuffer(boolean useFileMappedBuffer) {
         this.useFileMappedBuffer = useFileMappedBuffer;
         return this;
+    }
+
+    public EmbeddedJettyBuilder withWebAppClassPathResourceHandler(String path) {
+        createRootServletContextHandler(path).setResourceHandler(createWebAppClasspathResourceHandler());
+        return this;
+    }
+
+    public EmbeddedJettyBuilder withClassPathResourceHandler(String path, String resourceFolder) {
+        createRootServletContextHandler(path)
+                .setClassLoader(Thread.currentThread().getContextClassLoader())
+                .setResourceHandler(new ClasspathResourceHandler(resourceFolder, isStartedWithAppassembler()));
+        return this;
+    }
+
+    public EmbeddedJettyBuilder withServletContextContributors(ServletContextContributor ... contributors) {
+        withServletContextContributors("", contributors);
+        return this;
+    }
+
+    public EmbeddedJettyBuilder withServletContextContributors(String path, ServletContextContributor ... contributors) {
+
+        EmbeddedJettyBuilder.ServletContextHandlerBuilder servletContextHandlerBuilder = createRootServletContextHandler(path)
+                .setClassLoader(Thread.currentThread().getContextClassLoader());
+
+        for (ServletContextContributor contributor : contributors) {
+            contributor.contribute(servletContextHandlerBuilder);
+        }
+
+        return this;
+    }
+
+    public EmbeddedJettyBuilder withResourceHandler(String path, ResourceHandler resourceHandler) {
+        createRootServletContextHandler(path)
+                .setClassLoader(Thread.currentThread().getContextClassLoader())
+                .setResourceHandler(resourceHandler);
+        return this;
+    }
+
+    public EmbeddedJettyBuilder withWebArchiveContext(String path, Resource resource) {
+        createRootWebAppContext(path, resource);
+        return this;
+    }
+
+    public EmbeddedJettyBuilder withAccessLog() {
+        return addHttpAccessLogAtRoot();
+    }
+
+    public void run() {
+        try {
+            createServer().startJetty();
+        } catch (Throwable e) {
+            throw new RuntimeException("Error while starting Jetty.", e);
+        }
     }
 
     public static class ServletContextHandlerBuilder<H extends ServletContextHandler> extends HandlerBuilder<H> {

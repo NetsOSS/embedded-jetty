@@ -111,17 +111,6 @@
                     </dependency>
                 </dependencies>
             </plugin>
-            <plugin>
-                <groupId>org.sonatype.plugins</groupId>
-                <artifactId>nexus-staging-maven-plugin</artifactId>
-                <version>1.6.5</version>
-                <extensions>true</extensions>
-                <configuration>
-                    <!-- The Base URL of Nexus instance where we want to stage -->
-                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                    <serverId>sonatype-nexus-staging</serverId>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
 

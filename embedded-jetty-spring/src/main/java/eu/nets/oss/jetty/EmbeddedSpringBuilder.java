@@ -16,6 +16,24 @@ import javax.servlet.ServletContext;
  */
 public class EmbeddedSpringBuilder {
 
+    public static ServletContextContributor spring(Class ... contextConfigLocation) {
+        return new ServletContextContributor() {
+            @Override
+            public void contribute(EmbeddedJettyBuilder.ServletContextHandlerBuilder builder) {
+                builder.addEventListener(createSpringContextLoader(null, contextConfigLocation));
+            }
+        };
+    }
+
+    public static ServletContextContributor spring(String displayName, Class ... contextConfigLocation) {
+        return new ServletContextContributor() {
+            @Override
+            public void contribute(EmbeddedJettyBuilder.ServletContextHandlerBuilder builder) {
+                builder.addEventListener(createSpringContextLoader("", contextConfigLocation));
+            }
+        };
+    }
+
     /**
      * Creates a spring context loader listener
      *
@@ -28,6 +46,16 @@ public class EmbeddedSpringBuilder {
             @Override
             protected WebApplicationContext createWebApplicationContext(ServletContext sc) {
                 return webApplicationContext;
+            }
+        };
+    }
+
+    public static ContextLoaderListener createSpringContextLoader(final String displayName, final Class... contextConfigLocation) {
+        return new ContextLoaderListener() {
+            @SuppressWarnings("unchecked")
+            @Override
+            protected WebApplicationContext createWebApplicationContext(ServletContext sc) {
+                return createApplicationContext(displayName, contextConfigLocation);
             }
         };
     }
@@ -48,7 +76,9 @@ public class EmbeddedSpringBuilder {
             boolean refreshed = false;
 
             {
-                setDisplayName(displayName);
+                if (displayName != null) {
+                    setDisplayName(displayName);
+                }
                 register(contextConfigLocation);
             }
 
