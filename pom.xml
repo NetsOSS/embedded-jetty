@@ -129,6 +129,16 @@
 
     <profiles>
         <profile>
+            <id>nets-jenkins</id>
+            <distributionManagement>
+                <snapshotRepository>
+                    <id>nets-snapshots</id>
+                    <name>Repository for snapshot versions of Nets jars</name>
+                    <url>http://mvn.bbsas.no/repository/content/repositories/snapshots</url>
+                </snapshotRepository>
+            </distributionManagement>
+        </profile>
+        <profile>
             <id>netsoss</id>
             <build>
                 <plugins>
