@@ -33,8 +33,8 @@ public class AccessLogTest {
         EmbeddedJettyBuilder builder = getBuilder().createServer();
         EmbeddedJettyBuilder.ServletContextHandlerBuilder handlerBuilder = builder.createRootServletContextHandler("", new RequestLog() {
             @Override
-            public void log(Request request, int status, long written) {
-                lastStatus.set(status);
+            public void log(Request request, Response response) {
+                lastStatus.set(response.getStatus());
             }
         });
 
