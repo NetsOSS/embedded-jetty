@@ -5,7 +5,11 @@ import org.eclipse.jetty.http.HttpVersion;
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.SecurityHandler;
 import org.eclipse.jetty.server.*;
+import com.google.common.collect.Sets;
+import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.*;
+import org.eclipse.jetty.server.session.HashSessionManager;
 import org.eclipse.jetty.servlet.*;
 import org.eclipse.jetty.util.component.LifeCycle;
 import org.eclipse.jetty.util.resource.Resource;
@@ -20,8 +24,16 @@ import javax.servlet.DispatcherType;
 import javax.servlet.Filter;
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.Servlet;
+import javax.servlet.SessionTrackingMode;
+import java.io.File;
 import java.io.IOException;
-import java.net.*;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.URI;
+import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -184,7 +196,18 @@ public class EmbeddedJettyBuilder {
         public ServletContextHandlerBuilder(H handler) {
             super(handler);
             this.handler = handler;
+            Boolean sessionTrackingCookieOnly = Boolean.getBoolean("sessionTrackingCookieOnly");
+            Integer sessionInactiveTimeout = Integer.getInteger("sessionInactiveTimeout");
+            Boolean noPersistenceCookie = Boolean.getBoolean("noPersistenceCookie");
+
             setHttpCookieOnly(true);
+
+            if (sessionTrackingCookieOnly)
+                setSessionTrackingCookieOnly();
+            if (sessionInactiveTimeout != null)
+                setSessionInactiveTimeout(sessionInactiveTimeout);
+            if (noPersistenceCookie)
+                setNoPersistenceCookie();
         }
 
         public ServletHolderBuilder addServlet(Servlet servlet) {
@@ -196,6 +219,20 @@ public class EmbeddedJettyBuilder {
             return this;
         }
 
+        public ServletContextHandlerBuilder setSessionTrackingCookieOnly() {
+            handler.getSessionHandler().getSessionManager().setSessionTrackingModes(Sets.newHashSet(SessionTrackingMode.COOKIE));
+            return this;
+        }
+
+        public ServletContextHandlerBuilder setSessionInactiveTimeout(int inactiveTimeout) {
+            handler.getSessionHandler().getSessionManager().setMaxInactiveInterval(inactiveTimeout);
+            return this;
+        }
+
+        public ServletContextHandlerBuilder setNoPersistenceCookie() {
+            handler.getSessionHandler().getSessionManager().getSessionCookieConfig().setMaxAge(-1);
+            return this;
+        }
         /**
          * Adds an Event Listener to this servlet context, typically some implementation of ServletContextListener
          *
@@ -245,6 +282,20 @@ public class EmbeddedJettyBuilder {
         public ServletContextHandlerBuilder<H> setResourceHandler(ResourceHandler resourceHandler) {
             handler.setHandler(resourceHandler);
             return this;
+        }
+
+        public void useIdleSessionPersistence(int idleSavePeriod, File sessionPath) {
+            if(handler.getSessionHandler().getSessionManager().getMaxInactiveInterval() == -1) {
+                throw new IllegalStateException("can not use idle session persistence without setting sessionInactiveTimeout");
+            }
+            org.eclipse.jetty.server.session.HashSessionManager sessionManager = (HashSessionManager)handler.getSessionHandler().getSessionManager();
+            try {
+                sessionManager.setStoreDirectory(sessionPath);
+            } catch(Exception e) {
+                throw new RuntimeException(e);
+            }
+            sessionManager.setLazyLoad(true);
+            sessionManager.setIdleSavePeriod(idleSavePeriod);
         }
     }
 

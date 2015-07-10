@@ -13,6 +13,7 @@ import java.util.EventListener;
  */
 public class EmbeddedWicketBuilder {
 
+
     public static ServletContextContributor wicket(Class<? extends WebApplication> wicketApplication) {
         return new ServletContextContributor() {
             @Override
@@ -26,15 +27,14 @@ public class EmbeddedWicketBuilder {
                                                                                      Class<? extends WebApplication> wicketApplication,
                                                                                      boolean development) {
         String pathSpec = "/*";
-
         WicketServlet wicketServlet = new WicketServlet();
-        wicketHandler.addServlet(wicketServlet)
+        wicketHandler.addServlet(wicketServlet )
                 .mountAtPath(pathSpec)
                 .setInitParameter(WicketFilter.APP_FACT_PARAM, org.apache.wicket.spring.SpringWebApplicationFactory.class.getName())
                 .setInitParameter(ContextParamWebApplicationFactory.APP_CLASS_PARAM, wicketApplication.getName())
                 .setInitParameter(WicketFilter.FILTER_MAPPING_PARAM, pathSpec)
                 .setInitParameter("wicket.configuration",
-                        development ? RuntimeConfigurationType.DEVELOPMENT.name() : RuntimeConfigurationType.DEPLOYMENT.name());
+                        development ? RuntimeConfigurationType.DEVELOPMENT.name() :  RuntimeConfigurationType.DEPLOYMENT.name());
 
         return wicketHandler;
     }
