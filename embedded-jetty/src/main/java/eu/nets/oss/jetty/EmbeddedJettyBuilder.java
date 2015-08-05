@@ -136,6 +136,10 @@ public class EmbeddedJettyBuilder {
         return this;
     }
 
+    public EmbeddedJettyBuilder withWebAppClassPathResourceHandler() {
+        return withWebAppClassPathResourceHandler("");
+    }
+
     public EmbeddedJettyBuilder withWebAppClassPathResourceHandler(String path) {
         createRootServletContextHandler(path).setResourceHandler(createWebAppClasspathResourceHandler());
         return this;

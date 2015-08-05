@@ -15,7 +15,7 @@
     <description>Code for starting embedded Jetty.</description>
 
     <properties>
-        <spring.version>4.1.6.RELEASE</spring.version>
+        <spring.version>4.2.0.RELEASE</spring.version>
         <spring-ws.version>2.2.1.RELEASE</spring-ws.version>
     </properties>
 
